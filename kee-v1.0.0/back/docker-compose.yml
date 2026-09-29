@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: kee
+      POSTGRES_USER: kee
+      POSTGRES_PASSWORD: kee
+    ports: ["15432:5432"]
+    volumes: ["kee_pg:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kee -d kee"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  redis:
+    image: redis:7-alpine
+    ports: ["16379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  neo4j:
+    image: neo4j:5
+    environment:
+      NEO4J_AUTH: neo4j/kee-password
+      NEO4J_server_memory_heap_initial__size: 512m
+      NEO4J_server_memory_heap_max__size: 1G
+    ports: ["17474:7474", "17687:7687"]
+    volumes: ["kee_neo4j:/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+volumes:
+  kee_pg:
+  kee_neo4j:
