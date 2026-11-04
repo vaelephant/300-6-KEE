@@ -4,6 +4,7 @@
 use futures_util::{Stream, StreamExt};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use std::net::IpAddr;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
@@ -400,6 +401,33 @@ fn strip_reasoning(reply: &str) -> &str {
     }
 }
 
+/// 端点是本机或内网地址吗。只看 URL 里的字面量，不解析 DNS：
+/// `host.docker.internal` 这类名字在容器里本就没有系统代理可绕。
+fn is_local_endpoint(base_url: &str) -> bool {
+    let Some(host) = reqwest::Url::parse(base_url)
+        .ok()
+        .and_then(|u| u.host_str().map(str::to_ascii_lowercase))
+    else {
+        return false;
+    };
+    if host == "localhost" || host.ends_with(".localhost") {
+        return true;
+    }
+    match host.trim_start_matches('[').trim_end_matches(']').parse::<IpAddr>() {
+        Ok(IpAddr::V4(v4)) => v4.is_loopback() || v4.is_private() || v4.is_link_local(),
+        Ok(IpAddr::V6(v6)) => {
+            if let Some(v4) = v6.to_ipv4_mapped() {
+                return v4.is_loopback() || v4.is_private() || v4.is_link_local();
+            }
+            let seg = v6.segments()[0];
+            v6.is_loopback()
+                || (seg & 0xfe00) == 0xfc00 // fc00::/7 唯一本地
+                || (seg & 0xffc0) == 0xfe80 // fe80::/10 链路本地
+        }
+        Err(_) => false,
+    }
+}
+
 impl LlmClient {
     pub fn new(base_url: &str, api_key: Option<&str>, model: &str) -> Self {
         Self::with_timeouts(base_url, api_key, model, CONNECT_TIMEOUT, READ_TIMEOUT)
@@ -417,10 +445,10 @@ impl LlmClient {
         let mut builder = reqwest::Client::builder()
             .connect_timeout(connect)
             .read_timeout(read);
-        // 单测里的端点是本机临时端口；系统代理（Clash 一类）常把 127.0.0.1 也拦成 502，
-        // 测的就不再是客户端自己的行为。生产构建照旧走系统代理。
-        #[cfg(test)]
-        {
+        // 系统代理（Clash 一类）常把 127.0.0.1 也拦成 502，而 macOS 上 reqwest 只读
+        // 系统代理的地址、不读它的例外列表——本机 Ollama 就这么被送进代理。
+        // 单测一律直连：测的是客户端自己的行为，不是本机代理的。
+        if cfg!(test) || is_local_endpoint(base_url) {
             builder = builder.no_proxy();
         }
         Self {
@@ -1097,6 +1125,33 @@ mod tests {
 
     fn client_at(addr: std::net::SocketAddr) -> LlmClient {
         LlmClient::new(&format!("http://{addr}"), None, "m")
+    }
+
+    /// 本机 Ollama、局域网 vLLM 直连；云端厂商照旧走系统代理
+    #[test]
+    fn local_endpoints_skip_the_proxy() {
+        for url in [
+            "http://127.0.0.1:11434/v1",
+            "http://localhost:11434/v1",
+            "http://LOCALHOST:11434/v1",
+            "http://[::1]:11434/v1",
+            "http://192.168.1.20:8000/v1",
+            "http://10.0.0.5/v1",
+            "http://172.16.3.4:8000/v1",
+            "http://[fd00::1]:8000/v1",
+            "http://[::ffff:127.0.0.1]:11434/v1",
+        ] {
+            assert!(is_local_endpoint(url), "{url} 该直连");
+        }
+        for url in [
+            "https://api.deepseek.com/v1",
+            "https://dashscope.aliyuncs.com/compatible-mode/v1",
+            "http://8.8.8.8/v1",
+            "http://host.docker.internal:11434/v1",
+            "not a url",
+        ] {
+            assert!(!is_local_endpoint(url), "{url} 该走系统代理");
+        }
     }
 
     fn no_tools() -> serde_json::Value {

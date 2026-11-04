@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "8981c671-318b-4165-a85d-fb51483f3ba0",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "/Users/yan/code/300-6-KEE/输出 ppt/医疗自进化知识库/.archify/architecture-medical-kb-20260929-1250/candidate.json",
+  "output": "/Users/yan/code/300-6-KEE/输出 ppt/医疗自进化知识库/.archify/architecture-medical-kb-20260929-1250/medical-kb.html",
+  "specification": {
+    "sha256": "00feaa7c3b2993c1b05cc05bdf93800c5507c161e194ed90945678958a2e72b7",
+    "bytes": 4345
+  },
+  "artifact": {
+    "sha256": "3f256a043e99e75a947c62b07b20b4f3f2b5eba55ceeb943c0045ae5f6b0c83b",
+    "bytes": 770056
+  }
+}

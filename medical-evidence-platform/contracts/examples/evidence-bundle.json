@@ -1,0 +1,99 @@
+{
+  "schema_version": "1.0.0",
+  "tenant_id": "hospital_demo",
+  "bundle_id": "bundle_1",
+  "query_run_id": "qr_1",
+  "query_definition": {
+    "id": "creatinine_latest_two",
+    "version": 1
+  },
+  "scope": {
+    "patient_id": "patient_demo",
+    "encounter_id": "enc_demo"
+  },
+  "snapshot_id": "snap_1",
+  "created_at": "2026-10-01T01:00:00+08:00",
+  "execution_status": "completed",
+  "evidence_status": "insufficient",
+  "coverage": [
+    {
+      "system_id": "lis_demo",
+      "status": "available",
+      "synced_through": "2026-10-01T01:00:00+08:00",
+      "limitations": [
+        "未接入院外数据"
+      ]
+    }
+  ],
+  "facts": [
+    {
+      "schema_version": "1.0.0",
+      "tenant_id": "hospital_demo",
+      "fact_id": "fact_1",
+      "fact_version_id": "fv_1",
+      "version": 1,
+      "scope": {
+        "patient_id": "patient_demo",
+        "encounter_id": "enc_demo"
+      },
+      "fact_type": "observation",
+      "concept": {
+        "system": "local_demo",
+        "code": "CREA",
+        "display": "肌酐",
+        "mapping_version": "1"
+      },
+      "value": {
+        "kind": "quantity",
+        "raw_value": "86",
+        "value": "86",
+        "comparator": "eq",
+        "unit": "μmol/L",
+        "specimen": "serum"
+      },
+      "semantics": {
+        "polarity": "affirmed",
+        "certainty": "confirmed",
+        "subject": "patient",
+        "event_state": "documented"
+      },
+      "event_time": {
+        "precision": "datetime",
+        "value": "2026-10-01T01:00:00+08:00"
+      },
+      "recorded_time": {
+        "precision": "unknown"
+      },
+      "ingested_at": "2026-10-01T01:00:00+08:00",
+      "record_status": "final",
+      "publication_status": "published",
+      "origin": "source_structured",
+      "derivation": {
+        "processing_run_id": "run_1",
+        "processor_id": "lis_mapping",
+        "processor_version": "1",
+        "input_fact_version_ids": []
+      },
+      "anchor_ids": [
+        "anchor_1"
+      ],
+      "supersedes_fact_version_id": null
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "ev_1",
+      "anchor_id": "anchor_1",
+      "asset_version_id": "av_1"
+    }
+  ],
+  "conflicts": [],
+  "calculations": [],
+  "issues": [
+    {
+      "code": "INSUFFICIENT_OBSERVATIONS",
+      "message": "仅有一次结果，不能比较两次变化"
+    }
+  ],
+  "next_cursor": null
+}

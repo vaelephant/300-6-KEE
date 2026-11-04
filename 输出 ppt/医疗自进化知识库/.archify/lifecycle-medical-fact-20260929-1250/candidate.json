@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "一条医学事实的生命周期",
+    "locale": "zh-CN",
+    "output": ".archify/lifecycle-medical-fact-20260929-1250/medical-fact.html",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    { "id": "main", "label": "主路径" },
+    { "id": "waiting", "label": "等待确认" },
+    { "id": "terminal", "label": "终止出口" }
+  ],
+  "states": [
+    { "id": "stated", "type": "start", "label": "开放陈述", "sublabel": "文档原话 + 引文", "lane": "main", "col": 0, "step": "01" },
+    { "id": "aligned", "type": "active", "label": "已对齐", "sublabel": "绑定本体属性", "lane": "main", "col": 1, "step": "02" },
+    { "id": "asserted", "type": "success", "label": "生效事实", "sublabel": "valid_from 起成立", "lane": "main", "col": 2, "step": "03" },
+    { "id": "superseded", "type": "active", "label": "被新版接替", "sublabel": "闭合 valid_to", "lane": "main", "col": 3, "step": "04" },
+    { "id": "archived", "type": "success", "label": "历史可回放", "sublabel": "as_of 任意时刻", "lane": "main", "col": 4, "step": "05" },
+    { "id": "pending", "type": "waiting", "label": "待人工确认", "sublabel": "低置信 · 记忆类", "lane": "waiting", "col": 1 },
+    { "id": "conflict", "type": "decision", "label": "冲突待裁决", "sublabel": "公理 · 时序", "lane": "waiting", "col": 2 },
+    { "id": "rejected", "type": "failure", "label": "驳回", "sublabel": "不入账", "lane": "terminal", "col": 1 },
+    { "id": "retracted", "type": "failure", "label": "勘误撤回", "sublabel": "记录 invalidated_at", "lane": "terminal", "col": 3 }
+  ],
+  "transitions": [
+    { "from": "stated", "to": "aligned" },
+    { "from": "aligned", "to": "asserted" },
+    { "from": "asserted", "to": "superseded", "label": "新版指南" },
+    { "from": "superseded", "to": "archived" },
+    { "from": "aligned", "to": "pending", "label": "低置信", "variant": "dashed" },
+    { "from": "pending", "to": "asserted", "label": "确认" },
+    { "from": "pending", "to": "rejected", "variant": "security" },
+    { "from": "asserted", "to": "conflict", "label": "检测", "variant": "dashed" },
+    { "from": "conflict", "to": "retracted", "label": "勘误", "variant": "security" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "世界轴", "items": ["valid_from / valid_to：事实在现实中何时成立", "未写明起止时，以证据文档日期为锚"] },
+    { "dot": "amber", "title": "记录轴", "items": ["recorded_at / invalidated_at：系统何时相信、何时作废", "任意 as_of 时刻都能回放当时的认知"] },
+    { "dot": "rose", "title": "不覆盖", "items": ["改正事实 = 闭合旧行 + 追加新行", "撤回与驳回都留下可审计的决策记录"] }
+  ]
+}

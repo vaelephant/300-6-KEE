@@ -1,0 +1,42 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "新版指南进入后的自进化闭环",
+    "locale": "zh-CN",
+    "output": ".archify/workflow-guideline-evolution-20260929-1250/guideline-evolution.html",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    { "id": "source", "label": "来源与应用" },
+    { "id": "pipeline", "label": "抽取与对齐" },
+    { "id": "ledger", "label": "知识账本" },
+    { "id": "governance", "label": "治理与裁决", "variant": "exception" }
+  ],
+  "mainPath": ["newdoc", "extract", "align", "conflict", "agent", "facts", "qa"],
+  "nodes": [
+    { "id": "newdoc", "lane": "source", "col": 0, "type": "external", "label": "新版指南", "sublabel": "PDF · 网页同步", "width": 140 },
+    { "id": "extract", "lane": "pipeline", "col": 1, "type": "backend", "label": "开放抽取", "sublabel": "陈述 + 引文", "width": 140 },
+    { "id": "align", "lane": "pipeline", "col": 2, "type": "backend", "label": "签名对齐", "sublabel": "复用已批准绑定", "width": 140 },
+    { "id": "conflict", "lane": "governance", "col": 3, "type": "security", "label": "冲突检测", "sublabel": "时序接替 · 同时两值", "width": 140 },
+    { "id": "agent", "lane": "governance", "col": 4, "type": "backend", "label": "Agent 裁决", "sublabel": "常识 + 业务文档", "width": 140 },
+    { "id": "human", "lane": "governance", "col": 5, "type": "security", "label": "人工审核", "sublabel": "低置信进入队列", "width": 140 },
+    { "id": "facts", "lane": "ledger", "col": 5, "type": "database", "label": "双时态账本", "sublabel": "闭合旧行 + 追加新行", "width": 140 },
+    { "id": "qa", "lane": "source", "col": 5, "type": "frontend", "label": "临床问答", "sublabel": "按时刻 · 带引用", "width": 140 }
+  ],
+  "edges": [
+    { "id": "doc-extract", "from": "newdoc", "to": "extract", "label": "分块", "variant": "emphasis" },
+    { "id": "extract-align", "from": "extract", "to": "align", "label": "开放陈述", "variant": "emphasis" },
+    { "id": "align-conflict", "from": "align", "to": "conflict", "label": "类型化候选", "variant": "emphasis" },
+    { "id": "conflict-agent", "from": "conflict", "to": "agent", "label": "入队", "variant": "security" },
+    { "id": "agent-facts", "from": "agent", "to": "facts", "label": "高置信", "variant": "emphasis" },
+    { "id": "agent-human", "from": "agent", "to": "human", "label": "低置信", "variant": "security", "role": "branch" },
+    { "id": "human-facts", "from": "human", "to": "facts", "label": "确认", "role": "branch" },
+    { "id": "human-align", "from": "human", "to": "align", "label": "决策缓存复用", "variant": "dashed", "role": "return" },
+    { "id": "facts-qa", "from": "facts", "to": "qa", "label": "按时刻检索", "variant": "emphasis" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "吸收", "items": ["抽取只写文档原话，不预设本体", "已批准的签名直接复用，无需再调模型"] },
+    { "dot": "rose", "title": "治理", "items": ["冲突分队列治理，自动动作受可撤销闸门约束", "低置信裁决交给人，人的决策回流调优"] }
+  ]
+}

@@ -37,6 +37,9 @@ pub struct AppConfig {
     pub cookie_secure: bool,
     /// 是否开放注册。false 时仅首个用户（引导部署）可注册，其余需管理员开放。
     pub open_registration: bool,
+    /// 单次上传请求体上限（MB）。上传整份读进内存、解析时再整份读一遍，
+    /// 调高它就是拿内存换大文件：峰值约为文件大小的两倍。`UTOPIA_MAX_UPLOAD_MB`
+    pub max_upload_mb: usize,
 }
 
 impl Default for AppConfig {
@@ -53,6 +56,7 @@ impl Default for AppConfig {
             db_max_connections: None,
             cookie_secure: false,
             open_registration: true,
+            max_upload_mb: 100,
         }
     }
 }
@@ -173,9 +177,11 @@ mod tests {
         Jail::expect_with(|jail| {
             jail.set_env("UTOPIA_DB_MAX_CONNECTIONS", "");
             jail.set_env("UTOPIA_COOKIE_SECURE", "");
+            jail.set_env("UTOPIA_MAX_UPLOAD_MB", "");
             let cfg = AppConfig::load().unwrap();
             assert_eq!(cfg.db_max_connections, None);
             assert!(!cfg.cookie_secure);
+            assert_eq!(cfg.max_upload_mb, 100);
             Ok(())
         });
     }
@@ -186,9 +192,11 @@ mod tests {
         Jail::expect_with(|jail| {
             jail.set_env("UTOPIA_DB_MAX_CONNECTIONS", "8");
             jail.set_env("UTOPIA_COOKIE_SECURE", "true");
+            jail.set_env("UTOPIA_MAX_UPLOAD_MB", "1024");
             let cfg = AppConfig::load().unwrap();
             assert_eq!(cfg.db_max_connections, Some(8));
             assert!(cfg.cookie_secure);
+            assert_eq!(cfg.max_upload_mb, 1024);
             Ok(())
         });
     }

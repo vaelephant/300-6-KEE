@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "query-definition.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "query_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lifecycle": {
+      "enum": [
+        "draft",
+        "reviewed",
+        "published",
+        "retired"
+      ]
+    },
+    "scope_kind": {
+      "const": "single_patient"
+    },
+    "semantics": {
+      "type": "object",
+      "properties": {
+        "definition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_time_basis": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision_policy": {
+          "const": "latest_valid_as_of_snapshot"
+        },
+        "deduplication_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "missing_policy": {
+          "const": "explicit_status"
+        },
+        "comparability_rule": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "definition",
+        "event_time_basis",
+        "revision_policy",
+        "deduplication_rule",
+        "missing_policy",
+        "comparability_rule"
+      ],
+      "additionalProperties": false
+    },
+    "parameter_schema": {
+      "type": "object"
+    },
+    "result_schema_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "executor": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "sql_template",
+            "registered_api",
+            "retrieval",
+            "calculation",
+            "workflow"
+          ]
+        },
+        "artifact_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "kind",
+        "artifact_id",
+        "artifact_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "required_permissions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_results": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "timeout_ms",
+        "max_results"
+      ],
+      "additionalProperties": false
+    },
+    "test_suite_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approval": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "reviewer_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "approved_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "test_run_id": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "reviewer_id",
+            "approved_at",
+            "test_run_id"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "tenant_id",
+    "query_id",
+    "version",
+    "title",
+    "lifecycle",
+    "scope_kind",
+    "semantics",
+    "parameter_schema",
+    "result_schema_id",
+    "executor",
+    "required_permissions",
+    "limits",
+    "test_suite_id",
+    "approval"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "lifecycle": {
+            "const": "published"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "approval": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  ]
+}

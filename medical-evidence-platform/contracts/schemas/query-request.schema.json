@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "query-request.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "query_definition": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "patient_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "encounter_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      },
+      "required": [
+        "patient_id",
+        "encounter_id"
+      ],
+      "additionalProperties": false
+    },
+    "parameters": {
+      "type": "object"
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "schema_version",
+    "query_definition",
+    "scope",
+    "parameters",
+    "as_of"
+  ],
+  "additionalProperties": false
+}

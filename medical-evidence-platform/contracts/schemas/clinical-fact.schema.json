@@ -1,0 +1,444 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "clinical-fact.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fact_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fact_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "patient_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "encounter_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      },
+      "required": [
+        "patient_id",
+        "encounter_id"
+      ],
+      "additionalProperties": false
+    },
+    "fact_type": {
+      "enum": [
+        "observation",
+        "diagnosis",
+        "medication",
+        "allergy",
+        "procedure"
+      ]
+    },
+    "concept": {
+      "type": "object",
+      "properties": {
+        "system": {
+          "type": "string",
+          "minLength": 1
+        },
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "display": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mapping_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "system",
+        "code",
+        "display",
+        "mapping_version"
+      ],
+      "additionalProperties": false
+    },
+    "value": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "quantity"
+            },
+            "raw_value": {
+              "type": "string",
+              "minLength": 1
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            },
+            "comparator": {
+              "enum": [
+                "eq",
+                "lt",
+                "le",
+                "gt",
+                "ge"
+              ]
+            },
+            "unit": {
+              "type": "string",
+              "minLength": 1
+            },
+            "specimen": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "raw_value",
+            "value",
+            "comparator",
+            "unit",
+            "specimen"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "text"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "text"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "semantics": {
+      "type": "object",
+      "properties": {
+        "polarity": {
+          "enum": [
+            "affirmed",
+            "negated",
+            "unknown"
+          ]
+        },
+        "certainty": {
+          "enum": [
+            "confirmed",
+            "suspected",
+            "unknown"
+          ]
+        },
+        "subject": {
+          "enum": [
+            "patient",
+            "family",
+            "other",
+            "unknown"
+          ]
+        },
+        "event_state": {
+          "enum": [
+            "documented",
+            "planned",
+            "ordered",
+            "dispensed",
+            "administered",
+            "stopped",
+            "performed",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "polarity",
+        "certainty",
+        "subject",
+        "event_state"
+      ],
+      "additionalProperties": false
+    },
+    "event_time": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "precision": {
+              "const": "datetime"
+            },
+            "value": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": [
+            "precision",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "precision": {
+              "const": "date"
+            },
+            "value": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          "required": [
+            "precision",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "precision": {
+              "const": "unknown"
+            }
+          },
+          "required": [
+            "precision"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "recorded_time": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "precision": {
+              "const": "datetime"
+            },
+            "value": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "required": [
+            "precision",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "precision": {
+              "const": "date"
+            },
+            "value": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          "required": [
+            "precision",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "precision": {
+              "const": "unknown"
+            }
+          },
+          "required": [
+            "precision"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ingested_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "record_status": {
+      "enum": [
+        "preliminary",
+        "final",
+        "corrected",
+        "cancelled",
+        "unknown"
+      ]
+    },
+    "publication_status": {
+      "enum": [
+        "draft",
+        "quarantined",
+        "published",
+        "withdrawn"
+      ]
+    },
+    "origin": {
+      "enum": [
+        "source_structured",
+        "rule_extraction",
+        "model_extraction",
+        "manual",
+        "calculated",
+        "model_inference"
+      ]
+    },
+    "derivation": {
+      "type": "object",
+      "properties": {
+        "processing_run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "processor_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "processor_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input_fact_version_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "processing_run_id",
+        "processor_id",
+        "processor_version",
+        "input_fact_version_ids"
+      ],
+      "additionalProperties": false
+    },
+    "anchor_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "supersedes_fact_version_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "tenant_id",
+    "fact_id",
+    "fact_version_id",
+    "version",
+    "scope",
+    "fact_type",
+    "concept",
+    "value",
+    "semantics",
+    "event_time",
+    "recorded_time",
+    "ingested_at",
+    "record_status",
+    "publication_status",
+    "origin",
+    "derivation",
+    "anchor_ids",
+    "supersedes_fact_version_id"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "publication_status": {
+            "const": "published"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "anchor_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "origin": {
+            "const": "calculated"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "derivation": {
+            "properties": {
+              "input_fact_version_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

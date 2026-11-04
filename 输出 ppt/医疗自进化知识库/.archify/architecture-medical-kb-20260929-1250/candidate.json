@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "医疗自进化知识库 · 系统总览",
+    "locale": "zh-CN",
+    "output": ".archify/architecture-medical-kb-20260929-1250/medical-kb.html",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    { "id": "llm", "type": "cloud", "label": "内网大模型", "sublabel": "OpenAI 兼容端点", "pos": [560, 40], "size": [160, 64] },
+    { "id": "ontology", "type": "database", "label": "医学本体", "sublabel": "OWL 导入 · 本体包", "pos": [820, 40], "size": [160, 64] },
+    { "id": "corpus", "type": "external", "label": "医学语料", "sublabel": "指南 · 说明书 · 文献", "pos": [40, 240], "size": [160, 64] },
+    { "id": "ingest", "type": "backend", "label": "摄入解析", "sublabel": "分块 · 全文 + 向量", "pos": [300, 240], "size": [160, 64] },
+    { "id": "extract", "type": "backend", "label": "开放抽取", "sublabel": "原话陈述 + 引文", "pos": [560, 240], "size": [160, 64] },
+    { "id": "align", "type": "backend", "label": "签名对齐", "sublabel": "绑定 · 蕴含规则", "pos": [820, 240], "size": [160, 64] },
+    { "id": "review", "type": "security", "label": "审阅与裁决", "sublabel": "Agent 裁决 · 人工确认", "pos": [1080, 240], "size": [160, 64] },
+    { "id": "governance", "type": "security", "label": "冲突检测与推理", "sublabel": "公理 · 时序 · 勘误", "pos": [1340, 340], "size": [160, 64] },
+    { "id": "ledger", "type": "database", "label": "双时态账本", "sublabel": "valid · recorded 两条时钟", "pos": [1080, 440], "size": [160, 64] },
+    { "id": "retrieval", "type": "backend", "label": "检索与对话", "sublabel": "RRF 融合 · 原文引用", "pos": [300, 440], "size": [160, 64] },
+    { "id": "users", "type": "frontend", "label": "临床与科研", "sublabel": "医生 · 药师 · 质控", "pos": [40, 440], "size": [160, 64] },
+    { "id": "agent", "type": "external", "label": "外部 Agent", "sublabel": "MCP 只读工具", "pos": [40, 620], "size": [160, 64] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "院内私有化部署 · 单一服务 + Postgres", "wraps": ["llm", "ontology", "ingest", "extract", "align", "review", "governance", "ledger", "retrieval"] }
+  ],
+  "connections": [
+    { "id": "corpus-ingest", "from": "corpus", "to": "ingest", "label": "上传 · 同步", "variant": "emphasis" },
+    { "id": "ingest-extract", "from": "ingest", "to": "extract", "label": "分块", "variant": "emphasis" },
+    { "id": "extract-llm", "from": "extract", "to": "llm", "label": "温度 0 调用", "variant": "dashed" },
+    { "id": "extract-align", "from": "extract", "to": "align", "label": "开放陈述", "variant": "emphasis" },
+    { "id": "ontology-align", "from": "ontology", "to": "align", "label": "词表约束" },
+    { "id": "align-review", "from": "align", "to": "review", "label": "签名待审", "variant": "security" },
+    { "id": "review-ledger", "from": "review", "to": "ledger", "label": "批准后物化", "variant": "emphasis" },
+    { "id": "ledger-retrieval", "from": "ledger", "to": "retrieval", "label": "按时刻查询", "variant": "emphasis" },
+    { "id": "retrieval-users", "from": "retrieval", "to": "users", "label": "带引用回答", "variant": "emphasis" },
+    { "id": "ledger-governance", "from": "ledger", "to": "governance", "label": "扫描事实", "fromSide": "right", "toSide": "bottom" },
+    { "id": "governance-review", "from": "governance", "to": "review", "label": "冲突入队", "variant": "security", "fromSide": "top", "toSide": "right" },
+    { "id": "agent-retrieval", "from": "agent", "to": "retrieval", "label": "MCP", "variant": "dashed", "fromSide": "right", "toSide": "bottom" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "自进化", "items": ["新文档持续进入，只写开放图谱", "本体变更只重算受影响的签名", "人的裁决写入账本，用于调优 Agent"] },
+    { "dot": "emerald", "title": "可信", "items": ["每条陈述自带原文引句", "改正 = 闭合旧行 + 追加新行", "合并与裁决都可撤销、可审计"] },
+    { "dot": "amber", "title": "医疗落地", "items": ["医学本体可通过 OWL 导入", "模型可完全在院内网络运行", "病历类语料需先脱敏并按知识库分权"] }
+  ]
+}

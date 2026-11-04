@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0.0",
+  "tenant_id": "hospital_demo",
+  "anchor_id": "anchor_1",
+  "asset_version_id": "av_1",
+  "locator": {
+    "kind": "field",
+    "entity": "lab_result",
+    "record_key": "r_1",
+    "field_path": "result_value"
+  },
+  "created_at": "2026-10-01T01:00:00+08:00"
+}

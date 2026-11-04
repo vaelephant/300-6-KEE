@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "3e9bdc88-d633-45fc-8994-6731dab80e6c",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "/Users/yan/code/300-6-KEE/输出 ppt/医疗自进化知识库/.archify/workflow-guideline-evolution-20260929-1250/candidate.json",
+  "output": "/Users/yan/code/300-6-KEE/输出 ppt/医疗自进化知识库/.archify/workflow-guideline-evolution-20260929-1250/guideline-evolution.html",
+  "specification": {
+    "sha256": "a86523437acd0d4ddac9875f91faaeb68724a22aa845447634874e395542fb9d",
+    "bytes": 3203
+  },
+  "artifact": {
+    "sha256": "037ea6c898eb93a111120a1c083167d029fb3a3ea3f68bae86d894137fc2a15f",
+    "bytes": 758119
+  }
+}

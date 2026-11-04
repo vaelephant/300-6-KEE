@@ -44,8 +44,6 @@ use crate::error::ApiErr;
 
 use crate::state::AppState;
 
-const MAX_UPLOAD_BYTES: usize = 100 * 1024 * 1024;
-
 /// 把构建产物挂上去。**单独一段、而且不带 state**，所以它可以脱开数据库单测：
 /// 这一段的契约（哪条路 404、哪条路回首页、各自的缓存指示）已经破过两次，
 /// 一次是升级白屏（#616），一次是把 404 也存一年。
@@ -269,7 +267,9 @@ pub fn router(state: AppState, cfg: &AppConfig) -> Router {
             "/kbs/{id}/documents",
             get(documents_routes::list)
                 .post(documents_routes::upload)
-                .layer(DefaultBodyLimit::max(MAX_UPLOAD_BYTES)),
+                .layer(DefaultBodyLimit::max(
+                    cfg.max_upload_mb.saturating_mul(1024 * 1024),
+                )),
         )
         // 一键重试：抽取失败往往是成批的（模型端点断了一阵，那段时间进来的全挂）
         .route(

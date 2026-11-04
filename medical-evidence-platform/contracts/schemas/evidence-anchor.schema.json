@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "evidence-anchor.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "anchor_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "asset_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "locator": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "field"
+            },
+            "entity": {
+              "type": "string",
+              "minLength": 1
+            },
+            "record_key": {
+              "type": "string",
+              "minLength": 1
+            },
+            "field_path": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "entity",
+            "record_key",
+            "field_path"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "text"
+            },
+            "start": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "end": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "offset_unit": {
+              "const": "unicode_codepoint"
+            },
+            "text_representation_version_id": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "start",
+            "end",
+            "offset_unit",
+            "text_representation_version_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "page_region"
+            },
+            "page": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "x": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "y": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "width": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 1
+            },
+            "height": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 1
+            },
+            "coordinate_system": {
+              "const": "normalized_top_left"
+            },
+            "representation_version_id": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "kind",
+            "page",
+            "x",
+            "y",
+            "width",
+            "height",
+            "coordinate_system",
+            "representation_version_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "dicom_frame"
+            },
+            "study_uid": {
+              "type": "string",
+              "minLength": 1
+            },
+            "series_uid": {
+              "type": "string",
+              "minLength": 1
+            },
+            "instance_uid": {
+              "type": "string",
+              "minLength": 1
+            },
+            "frame_number": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "kind",
+            "study_uid",
+            "series_uid",
+            "instance_uid",
+            "frame_number"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "media_segment"
+            },
+            "start_ms": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "end_ms": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "kind",
+            "start_ms",
+            "end_ms"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "schema_version",
+    "tenant_id",
+    "anchor_id",
+    "asset_version_id",
+    "locator",
+    "created_at"
+  ],
+  "additionalProperties": false
+}

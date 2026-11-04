@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0.0",
+  "tenant_id": "hospital_demo",
+  "query_id": "creatinine_latest_two",
+  "version": 1,
+  "title": "最近两次肌酐结果",
+  "lifecycle": "draft",
+  "scope_kind": "single_patient",
+  "semantics": {
+    "definition": "查询血清肌酐最近两条有效正式结果",
+    "event_time_basis": "specimen_collection_time",
+    "revision_policy": "latest_valid_as_of_snapshot",
+    "deduplication_rule": "源系统+报告+项目+标本去重；同值不去重",
+    "missing_policy": "explicit_status",
+    "comparability_rule": "标本、单位与方法可比性检查；不足两次不计算变化"
+  },
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "limit": {
+        "const": 2
+      }
+    },
+    "required": [
+      "limit"
+    ],
+    "additionalProperties": false
+  },
+  "result_schema_id": "evidence-bundle.schema.json",
+  "executor": {
+    "kind": "sql_template",
+    "artifact_id": "creatinine_latest_two.sql",
+    "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "required_permissions": [
+    "patient.facts.read"
+  ],
+  "limits": {
+    "timeout_ms": 2000,
+    "max_results": 2
+  },
+  "test_suite_id": "creatinine_v1",
+  "approval": null
+}

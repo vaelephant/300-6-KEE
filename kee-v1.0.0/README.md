@@ -39,6 +39,8 @@ cd back
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+lsof -t -i:8306 | xargs kill -9 2>/dev/null; clear
+source .venv/bin/activate && 
 uvicorn app.main:app --reload --port 8306
 ```
 
@@ -58,6 +60,7 @@ Without the worker, uploads enqueue but stay `queued`.
 cd front
 cp .env.example .env.local
 pnpm install
+lsof -t -i:3030 | xargs kill -9 2>/dev/null; clear
 pnpm run dev --port 3030
 ```
 

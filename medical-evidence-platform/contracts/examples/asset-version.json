@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0.0",
+  "tenant_id": "hospital_demo",
+  "asset_id": "asset_1",
+  "asset_version_id": "av_1",
+  "version": 1,
+  "scope": {
+    "patient_id": "patient_demo",
+    "encounter_id": "enc_demo"
+  },
+  "modality": "structured",
+  "source": {
+    "system_id": "lis_demo",
+    "record_key": "r_1",
+    "source_version": null,
+    "history_completeness": "snapshot_only"
+  },
+  "content": {
+    "object_key": "demo/lis/r_1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "media_type": "application/json",
+    "size_bytes": 10
+  },
+  "record_status": "final",
+  "ingested_at": "2026-10-01T01:00:00+08:00",
+  "supersedes_asset_version_id": null
+}

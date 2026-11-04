@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0.0",
+  "query_definition": {
+    "id": "creatinine_latest_two",
+    "version": 1
+  },
+  "scope": {
+    "patient_id": "patient_demo",
+    "encounter_id": "enc_demo"
+  },
+  "parameters": {
+    "limit": 2
+  },
+  "as_of": "2026-10-01T01:00:00+08:00"
+}

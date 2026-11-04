@@ -1,0 +1,524 @@
+
+<!-- 01 · SWISS-COVER-ASCII · accent -->
+<section class="slide accent" data-layout="SWISS-COVER-ASCII" data-animate="hero">
+  <div class="canvas-card">
+    <canvas class="ascii-bg" aria-hidden="true"></canvas>
+    <div class="chrome-min">
+      <div class="l">医疗自进化知识库 · KEE Knowledge Evolution Engine</div>
+      <div class="r">2026.09 · 01 / 15</div>
+    </div>
+    <div style="flex:1;padding:0;display:grid;grid-template-rows:auto 1fr auto;gap:2.6vh">
+      <div data-anim="line" class="t-meta" style="color:rgba(255,255,255,.78);letter-spacing:.22em">Medical Knowledge · Self-Evolving</div>
+      <h1 data-anim="title" style="align-self:center;font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:min(9.6vw,16.4vh);line-height:1.02;letter-spacing:-.03em;color:#fff">让医学知识<br/>自己<span style="font-style:italic;font-weight:300">进化</span></h1>
+      <div data-anim="bottom" style="display:grid;grid-template-rows:auto auto;gap:1.6vh;border-top:1px solid rgba(255,255,255,.22);padding-top:2vh">
+        <div class="lead" style="max-width:56ch;color:rgba(255,255,255,.88);font-weight:400">面向医疗的自进化知识库：文档持续进入，事实可被更正，本体随语料生长——每一条结论都能追溯到原文与时间。</div>
+        <div style="display:flex;justify-content:space-between;align-items:end">
+          <div class="t-meta" style="color:rgba(255,255,255,.62)">方案介绍 · 基于 KEE 知识进化引擎</div>
+          <div class="t-meta" style="color:rgba(255,255,255,.62)">→ 方向键 / 滚轮翻页</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 · S03 Split Statement -->
+<section class="slide split" data-layout="S03" data-animate="statement">
+  <div class="canvas-card">
+    <div class="split-half">
+      <div class="half b-ink" style="padding:5.6vh 3.6vw 4.4vh;justify-content:space-between">
+        <div class="chrome-min" style="margin-bottom:0;color:rgba(255,255,255,.62)">
+          <div class="l">02 / 15</div>
+          <div class="r">The Problem</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2.4vh">
+          <div class="t-meta" style="color:rgba(255,255,255,.62)">为什么需要自进化</div>
+          <h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:min(8.4vw,14.6vh);line-height:1;letter-spacing:-.03em;color:#fff">知识<br/>会<span style="color:var(--accent-bright)">过期</span></h2>
+        </div>
+        <div class="t-meta" style="color:rgba(255,255,255,.5);border-top:1px solid rgba(255,255,255,.18);padding-top:2vh">指南在变 · 知识库却停在上线那天</div>
+      </div>
+      <div class="half b-grey" style="padding:5.6vh 3.6vw 4.4vh;justify-content:center;gap:0">
+        <div style="display:flex;flex-direction:column">
+          <div style="display:grid;grid-template-columns:3.2em 1fr;gap:1.2vw;padding:2.4vh 0;border-top:1px solid var(--grey-2)">
+            <span class="t-cat accent">01</span>
+            <p class="t-body">临床指南、药品说明书、专家共识按版本持续修订，旧推荐不会自己失效。</p>
+          </div>
+          <div style="display:grid;grid-template-columns:3.2em 1fr;gap:1.2vw;padding:2.4vh 0;border-top:1px solid var(--grey-2)">
+            <span class="t-cat">02</span>
+            <p class="t-body">向量知识库只会「召回相似」，分不清哪条是现行版本、哪条已被接替。</p>
+          </div>
+          <div style="display:grid;grid-template-columns:3.2em 1fr;gap:1.2vw;padding:2.4vh 0;border-top:1px solid var(--grey-2)">
+            <span class="t-cat">03</span>
+            <p class="t-body">静态知识图谱靠人工维护，本体一改就要整库重抽、重建。</p>
+          </div>
+          <div style="display:grid;grid-template-columns:3.2em 1fr;gap:1.2vw;padding:2.4vh 0;border-top:1px solid var(--grey-2);border-bottom:1px solid var(--grey-2)">
+            <span class="t-cat">04</span>
+            <p class="t-body">医疗场景的追问永远是：这条结论出自哪份文件？当时是否成立？谁确认的？</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 · S08 Duo Compare -->
+<section class="slide" data-layout="S08" data-animate="duo-mirror">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">医疗自进化知识库 · Paradigm</div>
+      <div class="r">03 / 15</div>
+    </div>
+    <div data-anim="line" style="display:flex;flex-direction:column;gap:1.4vh">
+      <div class="t-meta">Static vs Self-Evolving</div>
+      <h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:min(5.2vw,9.2vh);line-height:1.05;letter-spacing:-.03em">从「存进去」到「长出来」</h2>
+    </div>
+    <div class="duo-compare" style="margin-top:7vh;margin-bottom:var(--nav-safe-bottom)">
+      <div class="col">
+        <div class="col-tag"><span class="num">01</span>静态知识库</div>
+        <div class="col-ttl">一次建成</div>
+        <p class="col-desc">上线即定格。更新靠人工重建，只能回答「现在库里有什么」。</p>
+        <ul class="col-list">
+          <li>只保存当下，没有历史</li>
+          <li>相似召回，无法区分新旧版本</li>
+          <li>结论难以追溯到原文</li>
+          <li>本体变更需要整库重抽</li>
+        </ul>
+      </div>
+      <span class="vrule"></span>
+      <div class="col accent">
+        <div class="col-tag"><span class="num">02</span>自进化知识库</div>
+        <div class="col-ttl">持续生长</div>
+        <p class="col-desc">新文档进入即被吸收，冲突被发现并治理，人的每次决策都让系统更准。</p>
+        <ul class="col-list">
+          <li>双时态：何时为真 · 何时相信</li>
+          <li>每条事实强制带原文引句</li>
+          <li>冲突检测 → Agent 裁决 → 人工审核</li>
+          <li>本体变更只重算受影响的签名</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 · S09 Dot Matrix Statement · dark -->
+<section class="slide dark" data-layout="S09" data-animate="statement">
+  <div class="canvas-card">
+    <span class="ring-mat" aria-hidden="true" style="position:absolute;left:5vw;bottom:9vh;width:16vw;height:16vw;color:rgba(255,255,255,.5)"></span>
+    <span class="dot-mat" aria-hidden="true" style="position:absolute;right:5vw;top:12vh;width:30vw;height:30vw;color:var(--accent-bright)"></span>
+    <div class="chrome-min">
+      <div class="l">医疗自进化知识库 · Principle</div>
+      <div class="r">04 / 15</div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:3.6vh;max-width:64vw">
+      <div data-anim="line" class="t-meta">KEE 核心决定 · Decision 0044</div>
+      <h2 data-anim="stmt" style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:min(6.4vw,11.2vh);line-height:1.08;letter-spacing:-.03em;color:var(--paper)">本体，是文档所说<br/>之上的一层<span style="color:var(--accent-bright);font-weight:300">视图</span>。</h2>
+      <p data-anim="note" class="t-body" style="max-width:46ch;color:rgba(255,255,255,.72)">抽取只记录文档自己说了什么，提示词里不放本体。本体可以演进、可以改错；文档所说永远保留，随时可以按新本体重新对齐。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 05 · S05 Three Layers -->
+<section class="slide" data-layout="S05" data-animate="stack-build">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">医疗自进化知识库 · Architecture</div>
+      <div class="r">05 / 15</div>
+    </div>
+    <div data-anim="line" style="display:flex;flex-direction:column;gap:1.4vh">
+      <div class="t-meta">Three-Layer Model</div>
+      <h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:min(6.4vw,11.2vh);line-height:1;letter-spacing:-.03em">三层模型</h2>
+    </div>
+    <div class="stack-row" style="margin-top:5vh;margin-bottom:var(--nav-safe-bottom)">
+      <div class="stack-block b-grey">
+        <div class="layer-nb">LAYER 01 · OPEN GRAPH</div>
+        <i data-lucide="file-text"></i>
+        <div class="layer-ttl">开放图谱</div>
+        <p class="layer-desc">实体、文档自己的类别词、用原话写的陈述、引文与时间说法。例：某份指南里的一句推荐，连同原句一起入账。</p>
+        <div class="layer-tag">不依赖本体</div>
+      </div>
+      <div class="stack-block b-accent">
+        <div class="layer-nb">LAYER 02 · ONTOLOGY</div>
+        <i data-lucide="network"></i>
+        <div class="layer-ttl">医学本体</div>
+        <p class="layer-desc">类、关系、约束、继承与时态语义的词表。可选内置本体包，也可导入 OWL 格式的医学本体，或在工作台手改。</p>
+        <div class="layer-tag">词表 · 可演进</div>
+      </div>
+      <div class="stack-block b-ink">
+        <div class="layer-nb">LAYER 03 · TYPED GRAPH</div>
+        <i data-lucide="database"></i>
+        <div class="layer-ttl">类型化事实</div>
+        <p class="layer-desc">用本体属性表达的事实：开放陈述经签名对齐、人工确认后物化，自带世界轴与记录轴。</p>
+        <div class="layer-tag">可查询 · 可推理</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 · S11 Horizontal Timeline · grey -->
+<section class="slide grey" data-layout="S11" data-animate="timeline-walk">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">医疗自进化知识库 · Pipeline</div>
+      <div class="r">06 / 15</div>
+    </div>
+    <div data-anim="line" style="display:flex;flex-direction:column;gap:1.4vh">
+      <div class="t-meta">From Document to Trusted Fact</div>
+      <h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:min(5.2vw,9.2vh);line-height:1.05;letter-spacing:-.03em">从一份指南，到一条可信事实</h2>
+    </div>
+    <div class="timeline-h">
+      <div class="tl-row">
+        <div class="th-node up"><span class="dot"></span><div class="label"><span class="yr">01</span><span class="name">摄入解析</span><span class="desc" style="font-size:max(16px,.9vw)">解析 · 分块 · 全文 + 向量索引</span></div></div>
+        <div class="th-node down"><span class="dot"></span><div class="label"><span class="yr">02</span><span class="name">开放抽取</span><span class="desc" style="font-size:max(16px,.9vw)">每个分块一次调用，陈述必须带原文引句</span></div></div>
+        <div class="th-node up"><span class="dot"></span><div class="label"><span class="yr">03</span><span class="name">签名对齐</span><span class="desc" style="font-size:max(16px,.9vw)">关系短语 + 主语类 + 宾语类 → 本体属性</span></div></div>
+        <div class="th-node down accent"><span class="dot"></span><div class="label"><span class="yr">04</span><span class="name">确认物化</span><span class="desc" style="font-size:max(16px,.9vw)">人工确认后写入双时态事实</span></div></div>
+        <div class="th-node up"><span class="dot"></span><div class="label"><span class="yr">05</span><span class="name">推理与检索</span><span class="desc" style="font-size:max(16px,.9vw)">公理派生 · 冲突检测 · 带引用问答</span></div></div>
+      </div>
+    </div>
+    <div class="t-meta nav-safe-bottom-tight" style="border-top:1px solid var(--grey-2);padding-top:1.6vh">分块边界就是抽取能看见的全部上下文 · 切掉的内容无法靠提示词补回</div>
+  </div>
+</section>
+
+<!-- 07 · S22 Image Hero · archify architecture -->
+<section class="slide" data-layout="S22" data-animate="image-hero">
+  <div class="canvas-card" style="padding:0;display:flex;flex-direction:column;overflow:hidden">
+    <div data-anim="img" style="position:relative;flex:0 0 58%;overflow:hidden;background:#fbfbfa;border-bottom:1px solid var(--border-subtle)">
+      <img src="images/07-architecture.png" data-image-slot="s22-hero-21x9" alt="医疗自进化知识库系统总览架构图（Archify 生成）" loading="eager"
+           style="position:absolute;left:0;right:0;top:6.4vh;bottom:1.6vh;width:100%;height:calc(100% - 8vh);object-fit:contain;object-position:center center">
+      <div class="chrome-min" style="position:absolute;top:0;left:0;right:0;padding:3.2vh 5vw 0">
+        <div class="l">医疗自进化知识库 · System Overview · Archify</div>
+        <div class="r">07 / 15</div>
+      </div>
+      <div data-anim="title-block" style="position:absolute;left:5vw;top:9vh;background:var(--paper);padding:1.8vh 1.6vw;border-top:2px solid var(--accent)">
+        <div style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:min(3.4vw,6vh);line-height:1;letter-spacing:-.02em;color:var(--text-primary)">系统总览</div>
+      </div>
+    </div>
+    <div data-anim="kpi" class="image-hero-body" style="padding-top:4.6vh">
+      <div style="display:flex;flex-direction:column;gap:2vh">
+        <p style="max-width:40ch;font-family:var(--sans),var(--sans-zh);font-size:max(18px,1.2vw);line-height:1.6;font-weight:400;color:var(--text-primary)">一个服务进程 + 一个 Postgres（含 pgvector）：任务队列就是表，全文索引在进程内；大模型走任意 OpenAI 兼容端点，可以完全留在院内网络。</p>
+        <a class="t-meta" href=".archify/architecture-medical-kb-20260929-1250/medical-kb.html" target="_blank" style="color:var(--accent);text-decoration:none">→ 打开 Archify 交互版架构图</a>
+      </div>
+      <div class="image-hero-stats" style="gap:3vw">
+        <div style="display:flex;flex-direction:column;gap:.8vh"><div style="height:1px;background:var(--ink)"></div><div class="t-meta">Runtime</div><div style="font-family:var(--sans);font-weight:200;font-size:min(4.6vw,7.6vh);line-height:.95;letter-spacing:-.04em">1+1</div><p class="t-body-sm" style="margin-top:auto">服务进程 + 数据库，部署与运维面极小</p></div>
+        <div style="display:flex;flex-direction:column;gap:.8vh"><div style="height:1px;background:var(--ink)"></div><div class="t-meta">Ontology</div><div style="font-family:var(--sans);font-weight:200;font-size:min(4.6vw,7.6vh);line-height:.95;letter-spacing:-.04em">5</div><p class="t-body-sm" style="margin-top:auto">内置本体包冷启动，另可导入 OWL 医学本体</p></div>
+        <div style="display:flex;flex-direction:column;gap:.8vh"><div style="height:1px;background:var(--accent)"></div><div class="t-meta">Offline</div><div style="font-family:var(--sans);font-weight:200;font-size:min(4.6vw,7.6vh);line-height:.95;letter-spacing:-.04em;color:var(--accent)">100%</div><p class="t-body-sm" style="margin-top:auto">可离线部署，模型与数据都不出院</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 · S14 Loop Form · dark -->
+<section class="slide dark" data-layout="S14" data-animate="loop-form">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">医疗自进化知识库 · Self-Evolution</div>
+      <div class="r">08 / 15</div>
+    </div>
+    <div data-anim="line" style="display:flex;flex-direction:column;gap:1.4vh">
+      <div class="t-meta">The Loop</div>
+      <h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:min(6.4vw,11.2vh);line-height:1;letter-spacing:-.03em;color:var(--paper)">自进化闭环</h2>
+    </div>
+    <div data-anim="up" style="flex:1;display:grid;grid-template-columns:1.15fr 1fr;gap:5vw;align-items:center;margin-top:3vh;padding-bottom:var(--nav-safe-bottom)">
+      <div style="display:flex;flex-direction:column">
+        <div style="display:grid;grid-template-columns:4.2em 1fr;gap:1.4vw;padding:2.2vh 0;border-top:1px solid rgba(255,255,255,.18)">
+          <span class="t-cat" style="color:var(--accent-bright)">01 吸收</span>
+          <p class="t-body" style="color:rgba(255,255,255,.86)">新文档持续进入，只写开放图谱；已批准的签名直接复用，不必再调模型。</p>
+        </div>
+        <div style="display:grid;grid-template-columns:4.2em 1fr;gap:1.4vw;padding:2.2vh 0;border-top:1px solid rgba(255,255,255,.18)">
+          <span class="t-cat" style="color:rgba(255,255,255,.62)">02 发现</span>
+          <p class="t-body" style="color:rgba(255,255,255,.86)">时序接替、同时两值、公理违反、引文对不上——结构异常优先暴露。</p>
+        </div>
+        <div style="display:grid;grid-template-columns:4.2em 1fr;gap:1.4vw;padding:2.2vh 0;border-top:1px solid rgba(255,255,255,.18)">
+          <span class="t-cat" style="color:rgba(255,255,255,.62)">03 裁决</span>
+          <p class="t-body" style="color:rgba(255,255,255,.86)">Agent 依据常识与业务文档裁决；低置信的进入人工审核队列。</p>
+        </div>
+        <div style="display:grid;grid-template-columns:4.2em 1fr;gap:1.4vw;padding:2.2vh 0;border-top:1px solid rgba(255,255,255,.18);border-bottom:1px solid rgba(255,255,255,.18)">
+          <span class="t-cat" style="color:rgba(255,255,255,.62)">04 学习</span>
+          <p class="t-body" style="color:rgba(255,255,255,.86)">人的决策写入账本、用于调优 Agent；绑定被缓存，同类陈述下次自动物化。</p>
+        </div>
+      </div>
+      <div style="position:relative;height:min(52vh,30vw);aspect-ratio:1/1;justify-self:center">
+        <svg viewBox="0 0 400 400" style="width:100%;height:100%;overflow:visible" aria-hidden="true">
+          <defs>
+            <marker id="loop-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#5B7BFF"></path>
+            </marker>
+          </defs>
+          <circle cx="200" cy="200" r="150" fill="none" stroke="#ffffff" stroke-width="1" stroke-dasharray="4 6"></circle>
+          <circle cx="200" cy="200" r="92" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1"></circle>
+          <path d="M231.2 53.3 A150 150 0 0 1 346.7 168.8" fill="none" stroke="#5B7BFF" stroke-width="2" marker-end="url(#loop-arrow)"></path>
+          <path d="M346.7 231.2 A150 150 0 0 1 231.2 346.7" fill="none" stroke="#5B7BFF" stroke-width="2" marker-end="url(#loop-arrow)"></path>
+          <path d="M168.8 346.7 A150 150 0 0 1 53.3 231.2" fill="none" stroke="#5B7BFF" stroke-width="2" marker-end="url(#loop-arrow)"></path>
+          <path d="M53.3 168.8 A150 150 0 0 1 168.8 53.3" fill="none" stroke="#5B7BFF" stroke-width="2" marker-end="url(#loop-arrow)"></path>
+          <rect x="190" y="40" width="20" height="20" fill="#5B7BFF"></rect>
+          <rect x="340" y="190" width="20" height="20" fill="#ffffff"></rect>
+          <rect x="190" y="340" width="20" height="20" fill="#ffffff"></rect>
+          <rect x="40" y="190" width="20" height="20" fill="#ffffff"></rect>
+        </svg>
+        <span class="t-cat" style="position:absolute;left:50%;top:-1vh;transform:translate(-50%,-100%);color:var(--accent-bright)">01 吸收</span>
+        <span class="t-cat" style="position:absolute;right:-1vw;top:50%;transform:translate(100%,-50%);color:rgba(255,255,255,.72)">02 发现</span>
+        <span class="t-cat" style="position:absolute;left:50%;bottom:-1vh;transform:translate(-50%,100%);color:rgba(255,255,255,.72)">03 裁决</span>
+        <span class="t-cat" style="position:absolute;left:-1vw;top:50%;transform:translate(-100%,-50%);color:rgba(255,255,255,.72)">04 学习</span>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8vh">
+          <span style="font-family:var(--sans);font-weight:200;font-size:min(4.6vw,8.2vh);letter-spacing:-.03em;line-height:1;color:var(--paper)">LOOP</span>
+          <span class="t-meta">每一轮都更准</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 09 · S16 Multi-card Brief · image grid · archify workflow + lifecycle -->
+<section class="slide" data-layout="S16" data-animate="field-notes">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">医疗自进化知识库 · Archify Diagrams</div>
+      <div class="r">09 / 15</div>
+    </div>
+    <div data-anim="line" style="display:flex;flex-direction:column;gap:1.4vh">
+      <div class="t-meta">Workflow · Lifecycle</div>
+      <h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:min(5.2vw,9.2vh);line-height:1.05;letter-spacing:-.03em">一条事实如何被接纳、接替与撤回</h2>
+    </div>
+    <div data-anim="up" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2.4vw;margin-top:5vh;align-items:start">
+      <figure class="tile">
+        <div class="frame-img r-16x10 fit-contain" style="max-height:48vh"><img src="images/10-workflow.png" data-image-slot="s16-brief-16x10" alt="新版指南进入后的自进化闭环流程图（Archify 生成）"></div>
+        <figcaption class="swiss-img-caption"><strong>01 · 新版指南进入后的自进化闭环</strong><a href=".archify/workflow-guideline-evolution-20260929-1250/guideline-evolution.html" target="_blank" style="color:var(--accent);text-decoration:none">交互版 ↗</a></figcaption>
+      </figure>
+      <figure class="tile">
+        <div class="frame-img r-16x10 fit-contain" style="max-height:48vh"><img src="images/10-lifecycle.png" data-image-slot="s16-brief-16x10" alt="一条医学事实的生命周期状态图（Archify 生成）"></div>
+        <figcaption class="swiss-img-caption"><strong>02 · 一条医学事实的生命周期</strong><a href=".archify/lifecycle-medical-fact-20260929-1250/medical-fact.html" target="_blank" style="color:var(--accent);text-decoration:none">交互版 ↗</a></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 10 · S13 Three Forces -->
+<section class="slide" data-layout="S13" data-animate="three-forces">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">医疗自进化知识库 · Bitemporal</div>
+      <div class="r">10 / 15</div>
+    </div>
+    <div data-anim="up" style="flex:1;display:grid;grid-template-columns:5fr 11fr;gap:1.4vw;padding-bottom:var(--nav-safe-bottom);min-height:0">
+      <div class="card-ink" style="position:relative;overflow:hidden;padding:4vh 2.4vw;display:flex;flex-direction:column;justify-content:space-between">
+        <span class="dot-mat" aria-hidden="true" style="position:absolute;right:-2vw;bottom:-2vw;width:18vw;height:18vw;color:rgba(255,255,255,.35)"></span>
+        <span class="t-cat">Bitemporal Ledger</span>
+        <h2 style="position:relative;font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:min(5.8vw,10.2vh);line-height:1.06;letter-spacing:-.03em;color:var(--paper)">两条<br/>时钟</h2>
+        <p class="t-body" style="position:relative;color:rgba(255,255,255,.72)">医疗复盘要的不只是「当时为真的是什么」，还有「系统当时知道什么」。</p>
+      </div>
+      <div style="display:grid;grid-template-rows:repeat(3,1fr);gap:1.4vw;min-height:0">
+        <div class="card-fill" style="display:grid;grid-template-columns:min(7vw,12vh) 1fr;gap:2vw;align-items:center;padding:2.4vh 2vw">
+          <div style="font-family:var(--sans);font-weight:200;font-size:min(6vw,10.4vh);line-height:1;color:var(--accent);letter-spacing:-.04em">01</div>
+          <div style="display:flex;flex-direction:column;gap:.8vh"><span class="t-cat">World Axis · valid_from / valid_to</span><h3 class="t-h-prod">世界轴：事实在现实中何时成立</h3><p class="t-body-sm">例：一条用药推荐自旧版指南起成立，新版发布时闭合，而不是被删除。</p></div>
+        </div>
+        <div class="card-fill" style="display:grid;grid-template-columns:min(7vw,12vh) 1fr;gap:2vw;align-items:center;padding:2.4vh 2vw">
+          <div style="font-family:var(--sans);font-weight:200;font-size:min(6vw,10.4vh);line-height:1;color:var(--accent);letter-spacing:-.04em">02</div>
+          <div style="display:flex;flex-direction:column;gap:.8vh"><span class="t-cat">Record Axis · recorded_at / invalidated_at</span><h3 class="t-h-prod">记录轴：系统何时相信、何时作废</h3><p class="t-body-sm">回到任意 as_of 时刻，都能看到当时系统知道什么、依据是什么。</p></div>
+        </div>
+        <div class="card-fill" style="display:grid;grid-template-columns:min(7vw,12vh) 1fr;gap:2vw;align-items:center;padding:2.4vh 2vw">
+          <div style="font-family:var(--sans);font-weight:200;font-size:min(6vw,10.4vh);line-height:1;color:var(--accent);letter-spacing:-.04em">03</div>
+          <div style="display:flex;flex-direction:column;gap:.8vh"><span class="t-cat">Append-only</span><h3 class="t-h-prod">只追加：闭合旧行 + 追加新行</h3><p class="t-body-sm">改正从不原地覆盖；没写明起止时，以证据文档日期为锚，避免「自古成立」。</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 · S19 Four Cards · grey -->
+<section class="slide grey" data-layout="S19" data-animate="four-cards">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">医疗自进化知识库 · Trust</div>
+      <div class="r">11 / 15</div>
+    </div>
+    <div data-anim="line" style="display:flex;flex-direction:column;gap:2.4vh">
+      <div style="width:80px;height:2px;background:var(--accent)"></div>
+      <div style="display:flex;flex-direction:column;gap:1.4vh">
+        <div class="t-meta">What Medicine Requires</div>
+        <h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:min(5.8vw,10.2vh);line-height:1.06;letter-spacing:-.03em">医疗场景要的<br/>首先是可信</h2>
+      </div>
+    </div>
+    <div data-anim="up" style="display:grid;grid-template-columns:repeat(4,1fr);gap:2.4vw;margin-top:auto;padding-bottom:var(--nav-safe-bottom)">
+      <div style="display:flex;flex-direction:column;gap:1.4vh;border-top:1px solid var(--ink);padding-top:2vh">
+        <span class="t-meta">— 01 / Provenance</span>
+        <i data-lucide="quote" style="width:2vw;height:2vw;stroke-width:1.4"></i>
+        <h3 style="font-family:var(--sans),var(--sans-zh);font-weight:300;font-size:min(2.4vw,4.2vh);letter-spacing:-.02em">可溯源</h3>
+        <p class="t-body-sm">每条事实强制带原文引句；问答里的引用能点开原文分块。</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1.4vh;border-top:1px solid var(--ink);padding-top:2vh">
+        <span class="t-meta">— 02 / Reversible</span>
+        <i data-lucide="undo-2" style="width:2vw;height:2vw;stroke-width:1.4"></i>
+        <h3 style="font-family:var(--sans),var(--sans-zh);font-weight:300;font-size:min(2.4vw,4.2vh);letter-spacing:-.02em">可撤销</h3>
+        <p class="t-body-sm">实体合并、Agent 裁决、勘误都留有决策记录，随时可回滚。</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1.4vh;border-top:1px solid var(--ink);padding-top:2vh">
+        <span class="t-meta">— 03 / Conflicts</span>
+        <i data-lucide="git-compare" style="width:2vw;height:2vw;stroke-width:1.4"></i>
+        <h3 style="font-family:var(--sans),var(--sans-zh);font-weight:300;font-size:min(2.4vw,4.2vh);letter-spacing:-.02em">冲突可见</h3>
+        <p class="t-body-sm">时序冲突、自反、传递环、基数违规、本体缺陷，分队列治理。</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1.4vh;border-top:2px solid var(--accent);padding-top:2vh">
+        <span class="t-meta" style="color:var(--accent)">— 04 / Audit</span>
+        <i data-lucide="shield-check" style="width:2vw;height:2vw;stroke-width:1.4;color:var(--accent)"></i>
+        <h3 style="font-family:var(--sans),var(--sans-zh);font-weight:300;font-size:min(2.4vw,4.2vh);letter-spacing:-.02em;color:var(--accent)">可审计</h3>
+        <p class="t-body-sm">确认、拒绝、合并、重建写入只追加的决策账本，支撑合规复盘。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 · S12 Manifesto + Ink Banner -->
+<section class="slide" data-layout="S12" data-animate="manifesto">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">医疗自进化知识库 · Interim</div>
+      <div class="r">12 / 15</div>
+    </div>
+    <div data-anim="line" style="display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr);gap:4vw;align-items:start">
+      <div class="t-cat" style="grid-column:1 / -1;color:var(--accent)">阶段结论 · Manifesto</div>
+      <div style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:min(5.8vw,10.2vh);line-height:1.08;letter-spacing:-.03em">知识不是存进去的，<br/>是<span style="color:var(--accent);font-weight:300">长出来</span>的。</div>
+      <p class="t-body" style="padding-top:1.2vw;color:var(--text-secondary)">文档是证据，本体是视图，事实有时间，结论可追溯。四件事做到，知识库才能随医学一起更新，而不是随时间一起过期。</p>
+    </div>
+    <div data-anim="up" class="card-ink" style="margin:auto -5vw -4.4vh;padding:5vh 5vw 9vh;display:grid;grid-template-columns:1fr auto;gap:4vw;align-items:center">
+      <div style="font-family:var(--sans),var(--sans-zh);font-weight:300;font-size:min(2.6vw,4.6vh);line-height:1.3;letter-spacing:-.015em;color:var(--paper)">每一次更正都留下痕迹——<br/>这是医疗知识库的可信底线。</div>
+      <div style="display:grid;grid-template-columns:repeat(4,auto);gap:2.4vw;color:rgba(255,255,255,.8)">
+        <i data-lucide="file-text" style="width:2.4vw;height:2.4vw;stroke-width:1.2"></i>
+        <i data-lucide="network" style="width:2.4vw;height:2.4vw;stroke-width:1.2"></i>
+        <i data-lucide="clock" style="width:2.4vw;height:2.4vw;stroke-width:1.2"></i>
+        <i data-lucide="shield-check" style="width:2.4vw;height:2.4vw;stroke-width:1.2;color:var(--accent-bright)"></i>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 13 · S16 Multi-card Brief · six use cases -->
+<section class="slide" data-layout="S16" data-animate="field-notes">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">医疗自进化知识库 · Use Cases</div>
+      <div class="r">13 / 15</div>
+    </div>
+    <div data-anim="line" style="display:flex;flex-direction:column;gap:1.4vh">
+      <div class="t-meta">Where It Lands</div>
+      <h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:min(6.4vw,11.2vh);line-height:1;letter-spacing:-.03em">六个落地场景</h2>
+    </div>
+    <div data-anim="up" style="flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:1.2vw;margin-top:6vh;padding-bottom:var(--nav-safe-bottom);min-height:0">
+      <div class="card-accent" style="padding:2.6vh 1.6vw;display:flex;flex-direction:column;justify-content:space-between;gap:1.6vh">
+        <div style="display:flex;flex-direction:column;gap:1vh"><span class="t-meta" style="color:rgba(255,255,255,.72)">01</span><h3 class="t-h-prod" style="color:var(--accent-on)">临床指南版本追踪</h3><p class="t-body-sm" style="color:rgba(255,255,255,.86)">新版发布自动吸收，旧推荐闭合而非删除，问答按时刻作答。</p></div>
+        <span class="t-meta" style="align-self:flex-end;color:rgba(255,255,255,.72)">双时态</span>
+      </div>
+      <div class="card-fill" style="padding:2.6vh 1.6vw;display:flex;flex-direction:column;justify-content:space-between;gap:1.6vh">
+        <div style="display:flex;flex-direction:column;gap:1vh"><span class="t-meta">02</span><h3 class="t-h-prod">药品说明书与用药知识</h3><p class="t-body-sm">适应症、禁忌、相互作用陈述都带原文引句，便于药师核对。</p></div>
+        <span class="t-meta" style="align-self:flex-end">证据引句</span>
+      </div>
+      <div class="card-fill" style="padding:2.6vh 1.6vw;display:flex;flex-direction:column;justify-content:space-between;gap:1.6vh">
+        <div style="display:flex;flex-direction:column;gap:1vh"><span class="t-meta">03</span><h3 class="t-h-prod">院内制度与质控规范</h3><p class="t-body-sm">制度修订后自动发现与旧条款的冲突，进入治理队列。</p></div>
+        <span class="t-meta" style="align-self:flex-end">冲突检测</span>
+      </div>
+      <div class="card-fill" style="padding:2.6vh 1.6vw;display:flex;flex-direction:column;justify-content:space-between;gap:1.6vh">
+        <div style="display:flex;flex-direction:column;gap:1vh"><span class="t-meta">04</span><h3 class="t-h-prod">科研文献证据沉淀</h3><p class="t-body-sm">跨文献实体消歧与合并且可撤销，结论可追溯到段落。</p></div>
+        <span class="t-meta" style="align-self:flex-end">身份消歧</span>
+      </div>
+      <div class="card-fill" style="padding:2.6vh 1.6vw;display:flex;flex-direction:column;justify-content:space-between;gap:1.6vh">
+        <div style="display:flex;flex-direction:column;gap:1vh"><span class="t-meta">05</span><h3 class="t-h-prod">临床 Agent 的知识底座</h3><p class="t-body-sm">通过 MCP 暴露只读工具，Agent 按时刻检索图谱与文档。</p></div>
+        <span class="t-meta" style="align-self:flex-end">MCP</span>
+      </div>
+      <div class="card-fill" style="padding:2.6vh 1.6vw;display:flex;flex-direction:column;justify-content:space-between;gap:1.6vh">
+        <div style="display:flex;flex-direction:column;gap:1vh"><span class="t-meta">06</span><h3 class="t-h-prod">合规与审计复盘</h3><p class="t-body-sm">任一时刻「系统当时相信什么、依据是什么」都能回放。</p></div>
+        <span class="t-meta" style="align-self:flex-end">决策账本</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 14 · S20 Stacked KPI Ledger · dark -->
+<section class="slide dark" data-layout="S20" data-animate="stacked-ledger">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">医疗自进化知识库 · Engineering</div>
+      <div class="r">14 / 15</div>
+    </div>
+    <div style="flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:5vw;padding-bottom:var(--nav-safe-bottom);min-height:0">
+      <div style="display:flex;flex-direction:column;gap:1.4vh">
+        <div class="t-meta">Built to Be Audited</div>
+        <h2 style="font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:min(5.8vw,10.2vh);line-height:1.06;letter-spacing:-.03em;color:var(--paper)">工程<br/>底座</h2>
+        <p class="t-body" style="margin-top:auto;color:rgba(255,255,255,.72)">每个设计取舍都有编号决策记录可查，数据库只向前迁移；数字取自 KEE 仓库本身。</p>
+      </div>
+      <div data-anim="ledger" style="display:flex;flex-direction:column;justify-content:center">
+        <div class="ledger-row" style="display:grid;grid-template-columns:min(12vw,19vh) 1fr auto;gap:2vw;align-items:center;padding:1.6vh 0;border-top:1px solid rgba(255,255,255,.18)">
+          <div class="ledger-num" style="font-family:var(--sans);font-weight:200;font-size:min(7vw,11vh);line-height:1;letter-spacing:-.04em;color:var(--accent-bright)">53</div>
+          <div class="ledger-label" style="display:flex;flex-direction:column;gap:.4vh"><span class="t-h-prod" style="color:var(--paper)">份编号设计决策</span><span class="t-body-sm">docs/decisions · 每一条都写明为什么</span></div>
+          <i class="ledger-icon" data-lucide="book-open" style="width:2vw;height:2vw;stroke-width:1.3;color:rgba(255,255,255,.7)"></i>
+        </div>
+        <div class="ledger-row" style="display:grid;grid-template-columns:min(12vw,19vh) 1fr auto;gap:2vw;align-items:center;padding:1.6vh 0;border-top:1px solid rgba(255,255,255,.18)">
+          <div class="ledger-num" style="font-family:var(--sans);font-weight:200;font-size:min(7vw,11vh);line-height:1;letter-spacing:-.04em;color:var(--paper)">68</div>
+          <div class="ledger-label" style="display:flex;flex-direction:column;gap:.4vh"><span class="t-h-prod" style="color:var(--paper)">次只向前的数据库迁移</span><span class="t-body-sm">从核心表到双时态、名字事实、开放陈述</span></div>
+          <i class="ledger-icon" data-lucide="database" style="width:2vw;height:2vw;stroke-width:1.3;color:rgba(255,255,255,.7)"></i>
+        </div>
+        <div class="ledger-row" style="display:grid;grid-template-columns:min(12vw,19vh) 1fr auto;gap:2vw;align-items:center;padding:1.6vh 0;border-top:1px solid rgba(255,255,255,.18)">
+          <div class="ledger-num" style="font-family:var(--sans);font-weight:200;font-size:min(7vw,11vh);line-height:1;letter-spacing:-.04em;color:var(--paper)">9</div>
+          <div class="ledger-label" style="display:flex;flex-direction:column;gap:.4vh"><span class="t-h-prod" style="color:var(--paper)">个 Rust crate 分层实现</span><span class="t-body-sm">摄入 · 抽取 · 存储 · 推理 · 检索 · 模型客户端</span></div>
+          <i class="ledger-icon" data-lucide="boxes" style="width:2vw;height:2vw;stroke-width:1.3;color:rgba(255,255,255,.7)"></i>
+        </div>
+        <div class="ledger-row" style="display:grid;grid-template-columns:min(12vw,19vh) 1fr auto;gap:2vw;align-items:center;padding:1.6vh 0;border-top:1px solid rgba(255,255,255,.18);border-bottom:1px solid rgba(255,255,255,.18)">
+          <div class="ledger-num" style="font-family:var(--sans);font-weight:200;font-size:min(7vw,11vh);line-height:1;letter-spacing:-.04em;color:var(--paper)">5</div>
+          <div class="ledger-label" style="display:flex;flex-direction:column;gap:.4vh"><span class="t-h-prod" style="color:var(--paper)">个内置本体包</span><span class="t-body-sm">schema.org · W3C Org · PROV-O · FOAF · IOF Core</span></div>
+          <i class="ledger-icon" data-lucide="network" style="width:2vw;height:2vw;stroke-width:1.3;color:rgba(255,255,255,.7)"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 15 · SWISS-CLOSING-ASCII -->
+<section class="slide split" data-layout="SWISS-CLOSING-ASCII" data-animate="split-statement">
+  <div class="canvas-card">
+    <div class="split-half">
+      <div class="half b-accent" style="padding:5.6vh 3.6vw 4.4vh;justify-content:space-between;position:relative;overflow:hidden">
+        <canvas class="ascii-bg" aria-hidden="true"></canvas>
+        <div class="chrome-min" style="margin-bottom:0;position:relative;z-index:1">
+          <div class="l">15 / 15</div>
+          <div class="r">Closing</div>
+        </div>
+        <div data-anim="manifesto" style="display:flex;flex-direction:column;gap:2vh;position:relative;z-index:1">
+          <div class="t-meta" style="color:rgba(255,255,255,.78);letter-spacing:.22em;margin-bottom:1.6vh">Manifesto</div>
+          <h2 style="font-family:var(--sans),var(--sans-zh);font-size:min(7vw,12.4vh);line-height:1.04;letter-spacing:-.03em;font-weight:200;color:#fff">让知识<br/><span style="font-style:italic;font-weight:300">自己</span>生长</h2>
+          <div style="font-family:var(--sans),var(--sans-zh);font-size:max(18px,1.1vw);line-height:1.6;color:rgba(255,255,255,.86);font-weight:400;max-width:34ch;margin-top:1.4vh">从一个科室、一类文档开始，把知识库变成一套会随医学一起进化的系统。</div>
+        </div>
+        <div data-anim="signature" style="display:flex;justify-content:space-between;align-items:end;border-top:1px solid rgba(255,255,255,.22);padding-top:2vh;position:relative;z-index:1">
+          <div class="t-meta" style="color:rgba(255,255,255,.62)">KEE · Knowledge Evolution Engine</div>
+          <div class="t-meta" style="color:rgba(255,255,255,.62)">26.09.29</div>
+        </div>
+      </div>
+      <div class="half" style="padding:5.6vh 3.6vw 4.4vh;justify-content:space-between">
+        <div class="chrome-min">
+          <div class="l">Pilot Path</div>
+          <div class="r">03 Steps</div>
+        </div>
+        <div data-anim="rules" style="display:flex;flex-direction:column;gap:0">
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:2vw;align-items:start;padding:2.6vh 0;border-top:1px solid var(--border-subtle)">
+            <div style="font-family:var(--sans);font-weight:200;font-size:min(4.4vw,7.8vh);line-height:.9;color:var(--text-primary)">01</div>
+            <div>
+              <h3 style="font-family:var(--sans),var(--sans-zh);font-weight:400;font-size:max(18px,1.8vw);line-height:1.2;letter-spacing:-.015em;color:var(--text-primary);margin-bottom:1vh">选一个高频更新的场景</h3>
+              <p style="font-family:var(--sans),var(--sans-zh);font-size:max(16px,.94vw);line-height:1.6;color:var(--text-secondary);font-weight:400">例如某专科指南 + 院内制度；按知识库划分角色与权限，病历类语料先脱敏。</p>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:2vw;align-items:start;padding:2.6vh 0;border-top:1px solid var(--border-subtle)">
+            <div style="font-family:var(--sans);font-weight:200;font-size:min(4.4vw,7.8vh);line-height:.9;color:var(--text-primary)">02</div>
+            <div>
+              <h3 style="font-family:var(--sans),var(--sans-zh);font-weight:400;font-size:max(18px,1.8vw);line-height:1.2;letter-spacing:-.015em;color:var(--text-primary);margin-bottom:1vh">冷启动本体与模型</h3>
+              <p style="font-family:var(--sans),var(--sans-zh);font-size:max(16px,.94vw);line-height:1.6;color:var(--text-secondary);font-weight:400">勾选内置本体包或导入 OWL 医学本体，接入院内 OpenAI 兼容模型端点。</p>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:2vw;align-items:start;padding:2.6vh 0;border-top:1px solid var(--border-subtle);border-bottom:2px solid var(--accent)">
+            <div style="font-family:var(--sans);font-weight:200;font-size:min(4.4vw,7.8vh);line-height:.9;color:var(--accent)">03</div>
+            <div>
+              <h3 style="font-family:var(--sans),var(--sans-zh);font-weight:400;font-size:max(18px,1.8vw);line-height:1.2;letter-spacing:-.015em;color:var(--accent);margin-bottom:1vh">让闭环转起来</h3>
+              <p style="font-family:var(--sans),var(--sans-zh);font-size:max(16px,.94vw);line-height:1.6;color:var(--text-secondary);font-weight:400">低置信进入人工审核，人的决策回流调优 Agent——知识库越用越准。</p>
+            </div>
+          </div>
+        </div>
+        <div data-anim="foot" class="t-meta" style="color:var(--text-helper);text-align:right">→ 完 · 感谢聆听</div>
+      </div>
+    </div>
+  </div>
+</section>
+

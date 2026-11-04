@@ -1,0 +1,291 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "evidence-bundle.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "bundle_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "query_run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "query_definition": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "patient_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "encounter_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      },
+      "required": [
+        "patient_id",
+        "encounter_id"
+      ],
+      "additionalProperties": false
+    },
+    "snapshot_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "execution_status": {
+      "enum": [
+        "completed",
+        "partial",
+        "failed"
+      ]
+    },
+    "evidence_status": {
+      "enum": [
+        "supported",
+        "insufficient",
+        "conflicting",
+        "not_evaluated"
+      ]
+    },
+    "coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "system_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "available",
+              "not_connected",
+              "delayed",
+              "failed",
+              "unknown"
+            ]
+          },
+          "synced_through": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "limitations": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 0,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "system_id",
+          "status",
+          "synced_through",
+          "limitations"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "$ref": "clinical-fact.schema.json"
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "evidence_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "anchor_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset_version_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "evidence_id",
+          "anchor_id",
+          "asset_version_id"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fact_version_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 2,
+            "uniqueItems": true
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "code",
+          "fact_version_ids",
+          "description"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "calculations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "calculation_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rule_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rule_version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "input_fact_version_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "result_fact_version_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "calculation_id",
+          "rule_id",
+          "rule_version",
+          "input_fact_version_ids",
+          "result_fact_version_id"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "next_cursor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "tenant_id",
+    "bundle_id",
+    "query_run_id",
+    "query_definition",
+    "scope",
+    "snapshot_id",
+    "created_at",
+    "execution_status",
+    "evidence_status",
+    "coverage",
+    "facts",
+    "evidence",
+    "conflicts",
+    "calculations",
+    "issues",
+    "next_cursor"
+  ],
+  "additionalProperties": false
+}

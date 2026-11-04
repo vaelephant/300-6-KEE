@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "asset-version.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "asset_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "asset_version_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "patient_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "encounter_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      },
+      "required": [
+        "patient_id",
+        "encounter_id"
+      ],
+      "additionalProperties": false
+    },
+    "modality": {
+      "enum": [
+        "structured",
+        "text",
+        "pdf",
+        "image",
+        "dicom",
+        "audio",
+        "video"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "system_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "record_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "history_completeness": {
+          "enum": [
+            "full",
+            "snapshot_only",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "system_id",
+        "record_key",
+        "source_version",
+        "history_completeness"
+      ],
+      "additionalProperties": false
+    },
+    "content": {
+      "type": "object",
+      "properties": {
+        "object_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "media_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "object_key",
+        "sha256",
+        "media_type",
+        "size_bytes"
+      ],
+      "additionalProperties": false
+    },
+    "record_status": {
+      "enum": [
+        "preliminary",
+        "final",
+        "corrected",
+        "cancelled",
+        "unknown"
+      ]
+    },
+    "ingested_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "supersedes_asset_version_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "tenant_id",
+    "asset_id",
+    "asset_version_id",
+    "version",
+    "scope",
+    "modality",
+    "source",
+    "content",
+    "record_status",
+    "ingested_at",
+    "supersedes_asset_version_id"
+  ],
+  "additionalProperties": false
+}

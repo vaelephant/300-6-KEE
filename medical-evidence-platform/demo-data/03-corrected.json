@@ -1,0 +1,102 @@
+{
+  "asset": {
+    "schema_version": "1.0.0",
+    "tenant_id": "hospital_demo",
+    "asset_id": "asset_visit_b",
+    "asset_version_id": "asset_visit_b_v2",
+    "version": 2,
+    "scope": {
+      "patient_id": "patient_demo",
+      "encounter_id": "enc_demo"
+    },
+    "modality": "structured",
+    "source": {
+      "system_id": "lis_demo",
+      "record_key": "record_visit_b",
+      "source_version": null,
+      "history_completeness": "snapshot_only"
+    },
+    "content": {
+      "object_key": "demo/lis/r_1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "media_type": "application/json",
+      "size_bytes": 10
+    },
+    "record_status": "corrected",
+    "ingested_at": "2026-10-01T01:00:00+08:00",
+    "supersedes_asset_version_id": "asset_visit_b_v1"
+  },
+  "anchor": {
+    "schema_version": "1.0.0",
+    "tenant_id": "hospital_demo",
+    "anchor_id": "anchor_visit_b_v2",
+    "asset_version_id": "asset_visit_b_v2",
+    "locator": {
+      "kind": "field",
+      "entity": "lab_result",
+      "record_key": "record_visit_b",
+      "field_path": "result_value"
+    },
+    "created_at": "2026-10-01T01:00:00+08:00"
+  },
+  "fact": {
+    "schema_version": "1.0.0",
+    "tenant_id": "hospital_demo",
+    "fact_id": "fact_visit_b",
+    "fact_version_id": "fact_visit_b_v2",
+    "version": 2,
+    "scope": {
+      "patient_id": "patient_demo",
+      "encounter_id": "enc_demo"
+    },
+    "fact_type": "observation",
+    "concept": {
+      "system": "local_demo",
+      "code": "CREA",
+      "display": "肌酐",
+      "mapping_version": "1"
+    },
+    "value": {
+      "kind": "quantity",
+      "raw_value": "90",
+      "value": "90",
+      "comparator": "eq",
+      "unit": "μmol/L",
+      "specimen": "serum"
+    },
+    "semantics": {
+      "polarity": "affirmed",
+      "certainty": "confirmed",
+      "subject": "patient",
+      "event_state": "documented"
+    },
+    "event_time": {
+      "precision": "datetime",
+      "value": "2026-09-29T09:00:00+08:00"
+    },
+    "recorded_time": {
+      "precision": "unknown"
+    },
+    "ingested_at": "2026-10-01T01:00:00+08:00",
+    "record_status": "corrected",
+    "publication_status": "published",
+    "origin": "source_structured",
+    "derivation": {
+      "processing_run_id": "run_1",
+      "processor_id": "lis_mapping",
+      "processor_version": "1",
+      "input_fact_version_ids": []
+    },
+    "anchor_ids": [
+      "anchor_visit_b_v2"
+    ],
+    "supersedes_fact_version_id": "fact_visit_b_v1"
+  },
+  "source_record": {
+    "result_value": "90",
+    "unit": "μmol/L",
+    "specimen": "serum",
+    "specimen_time": "2026-09-29T09:00:00+08:00",
+    "report_status": "corrected"
+  }
+}

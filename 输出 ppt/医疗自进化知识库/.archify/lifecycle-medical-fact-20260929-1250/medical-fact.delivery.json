@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "2e56183a-d0df-4f43-9925-80f408ab376c",
+  "status": "current",
+  "command": "deliver",
+  "type": "lifecycle",
+  "input": "/Users/yan/code/300-6-KEE/输出 ppt/医疗自进化知识库/.archify/lifecycle-medical-fact-20260929-1250/candidate.json",
+  "output": "/Users/yan/code/300-6-KEE/输出 ppt/医疗自进化知识库/.archify/lifecycle-medical-fact-20260929-1250/medical-fact.html",
+  "specification": {
+    "sha256": "a7eedbadf9db9e0d4ac89be541fad8196f6d2c76c4683e2fc47cdf56592d913c",
+    "bytes": 2831
+  },
+  "artifact": {
+    "sha256": "9733c6c9c46ffdd6c5451b9c9ccc30114b3c569241f15dfb4baf1ab5bc6caa17",
+    "bytes": 760678
+  }
+}
