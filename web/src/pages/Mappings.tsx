@@ -6,11 +6,11 @@
 //
 // 审批留在同一个端点上（`review/mappings/{id}`，那里已经在写审计流水），
 // 搬的是界面不是逻辑：判断一条口径对不对要看得见表结构，而那在这一页。
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Database, Plug, Plus, Search } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
-import { api, type ConceptMapping } from "../api";
+import { api, type ConceptMapping, type Kb } from "../api";
 import { S } from "../i18n";
 import { useKb } from "../kb";
 import { toast } from "../toast";
@@ -65,6 +65,80 @@ export const selectedMappingIds = (
     )
     .map((mapping) => mapping.id);
 
+type ExplorationRun = NonNullable<
+  Awaited<ReturnType<typeof api.mappings>>["last_run"]
+>;
+
+/** 一轮探索的账。接口本来就带回丢弃原因、覆盖表和错误，从前页面只拼了一行摘要。 */
+function ExplorationAccount({ run }: { run: ExplorationRun }) {
+  const running = run.finished_at == null;
+  const drops = Object.entries(run.dropped ?? {}).filter(([, row]) => row.n > 0);
+  return (
+    <div className="glass rounded-panel px-4 py-3 space-y-1.5 text-small text-ink-2">
+      <p>
+        {running && <span className="text-warn">{S.mapping.runLive} · </span>}
+        {run.error && <span className="text-danger">{S.mapping.runFailed} · </span>}
+        {S.mapping.lastRun({
+          tables: run.tables_scanned,
+          columns: run.columns_scanned,
+          returned: run.returned,
+          accepted: run.accepted,
+          truncated: run.schema_truncated,
+        })}
+        {run.tables_covered.length > 0 && (
+          <> · {S.mapping.runCovered(run.tables_covered.length)}</>
+        )}
+      </p>
+      {run.sources.length > 0 && <p>{S.mapping.runSources(run.sources.join("、"))}</p>}
+      {run.error && <p className="text-danger">{run.error}</p>}
+      {drops.length > 0 && (
+        <ul className="space-y-1">
+          {drops.map(([code, row]) => (
+            <li key={code}>
+              {S.mapping.runDrop(
+                S.mapping.dropReasons[code as keyof typeof S.mapping.dropReasons] ?? code,
+                row.n,
+                row.example,
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+/** 探索写进库里的说明和还没答上的问题。这两样从前只进问数的提示词，页面上看不见。 */
+function DataNotes({ kb }: { kb: Kb | undefined }) {
+  const description = kb?.data_description?.trim();
+  const rawQuestions = kb?.data_questions;
+  const questions = (Array.isArray(rawQuestions) ? rawQuestions : [])
+    .filter((q): q is string => typeof q === "string")
+    .map((q) => q.trim())
+    .filter(Boolean);
+  if (!description && questions.length === 0) return null;
+  return (
+    <div className="glass rounded-panel px-4 py-3 space-y-3 text-small">
+      {description && (
+        <div>
+          <p className="text-ink-2">{S.mapping.dataDescription}</p>
+          <p className="mt-1 whitespace-pre-wrap text-ink">{description}</p>
+        </div>
+      )}
+      {questions.length > 0 && (
+        <div>
+          <p className="text-ink-2">{S.mapping.dataQuestions}</p>
+          <ul className="mt-1 list-disc space-y-1 pl-4 text-ink">
+            {questions.map((q) => (
+              <li key={q}>{q}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const TONE: Record<string, ChipTone> = {
   proposed: "warn",
   confirmed: "success",
@@ -94,6 +168,9 @@ export function Mappings() {
   const [deciding, setDeciding] = useState<Set<string>>(() => new Set());
   useEffect(() => setPicked(new Set()), [kb?.id, page, q, status, tab]);
 
+  // 点了「探查」之后，上一轮的 finished_at 还在，不能靠它判断新的一轮开始了没有
+  const watchAfter = useRef(0);
+  const [exploreWatch, setExploreWatch] = useState(false);
   const data = useQuery({
     queryKey: ["mappings", kb?.id, status, q, page],
     queryFn: () =>
@@ -104,7 +181,26 @@ export function Mappings() {
         offset: page * PAGE,
       }),
     enabled: !!kb,
+    refetchInterval: (q) => {
+      const run = q.state.data?.last_run;
+      if (run && run.finished_at == null) return 2000;
+      if (exploreWatch) return 2000;
+      return false;
+    },
   });
+  const detail = useQuery({
+    queryKey: ["kbOne", kb?.id],
+    queryFn: () => api.kbDetail(kb!.id),
+    enabled: !!kb,
+    refetchInterval: exploreWatch ? 2000 : false,
+  });
+  useEffect(() => {
+    const run = data.data?.last_run;
+    if (!exploreWatch || !run?.finished_at) return;
+    if (Date.parse(run.started_at) >= watchAfter.current - 3000) {
+      setExploreWatch(false);
+    }
+  }, [exploreWatch, data.data?.last_run]);
 
   const refresh = () =>
     queryClient.invalidateQueries({ queryKey: ["mappings", kb?.id] });
@@ -170,7 +266,14 @@ export function Mappings() {
         />
 
       {tab === "sources" ? (
-        <DataSources kbId={kb.id} onExplored={refresh} />
+        <DataSources
+          kbId={kb.id}
+          onExplored={() => {
+            watchAfter.current = Date.now();
+            setExploreWatch(true);
+            refresh();
+          }}
+        />
       ) : (
         <div className="space-y-4">
           {/* 筛选是下拉，不是一排按钮：四档状态是"挑一个看"，与全站其它页面的
@@ -266,18 +369,11 @@ export function Mappings() {
               从「等量提议」里看出覆盖范围。filtered out of view 反而更糟：搜索框
               在搜索的时候人最容易忘上一次跑了多深 */}
           {data.data?.last_run ? (
-            <p className="text-small text-ink-2">
-              {S.mapping.lastRun({
-                tables: data.data.last_run.tables_scanned,
-                columns: data.data.last_run.columns_scanned,
-                returned: data.data.last_run.returned,
-                accepted: data.data.last_run.accepted,
-                truncated: data.data.last_run.schema_truncated,
-              })}
-            </p>
+            <ExplorationAccount run={data.data.last_run} />
           ) : (
             <p className="text-small text-ink-2">{S.mapping.lastRunMissing}</p>
           )}
+          <DataNotes kb={detail.data} />
 
           {data.isPending ? (
             <Loading>{S.nav.loading}</Loading>

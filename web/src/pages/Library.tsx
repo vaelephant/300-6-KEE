@@ -332,6 +332,12 @@ export function Library() {
   // 过滤词变化回到第一页
   useEffect(() => setPage(0), [filter]);
 
+  const sourceScope =
+    selection === "all" || selection === "deleted"
+      ? undefined
+      : selection === "uploads"
+        ? "none"
+        : selection;
   // 状态变化经 SSE 事件流推送（useKbEvents 挂在 Shell），无需轮询
   const docs = useQuery({
     // **服务端筛选与分页**：作用域、名字、抽取状态、页码都进 queryKey，
@@ -339,12 +345,7 @@ export function Library() {
     queryKey: ["documents", kb?.id, selection, filter, graphFilter, page],
     queryFn: () =>
       api.documents(kb!.id, {
-        source:
-          selection === "all" || selection === "deleted"
-            ? undefined
-            : selection === "uploads"
-              ? "none"
-              : selection,
+        source: sourceScope,
         state: selection === "deleted" ? "deleted" : undefined,
         q: filter.trim() || undefined,
         graph: graphFilter || undefined,
@@ -353,6 +354,29 @@ export function Library() {
       }),
     enabled: !!kb,
     placeholderData: (prev) => prev,
+  });
+  // 进度条只给一个分数。排队和正在抽的文件名、文本块、丢弃数另取一页，
+  // 键以 documents 开头，文档事件会把它和列表一起刷掉
+  const inflight = useQuery({
+    queryKey: ["documents", kb?.id, "inflight", sourceScope],
+    queryFn: async () => {
+      const [extracting, queued] = await Promise.all([
+        api.documents(kb!.id, {
+          source: sourceScope,
+          graph: "extracting",
+          limit: 20,
+          offset: 0,
+        }),
+        api.documents(kb!.id, {
+          source: sourceScope,
+          graph: "queued",
+          limit: 20,
+          offset: 0,
+        }),
+      ]);
+      return [...extracting.docs, ...queued.docs];
+    },
+    enabled: !!kb && selection !== "deleted" && (docs.data?.extracting ?? 0) > 0,
   });
   const sources = useQuery({
     queryKey: ["sources", kb?.id],
@@ -678,6 +702,7 @@ export function Library() {
             if (pending === 0) return null;
             const done = docs.data?.done ?? 0;
             const total = done + pending;
+            const running = inflight.data ?? [];
             return (
               <div className="mb-3 glass rounded-panel px-4 py-3">
                 <div className="flex items-center justify-between text-small text-ink-2 mb-2">
@@ -692,6 +717,41 @@ export function Library() {
                     style={{ width: `${(done / Math.max(total, 1)) * 100}%` }}
                   />
                 </div>
+                {running.length > 0 && (
+                  <ul className="mt-3 space-y-1.5">
+                    {running.map((d) => {
+                      const dropped = (dropsByDoc.get(d.id) ?? []).reduce(
+                        (n, row) => n + row.count,
+                        0,
+                      );
+                      const graph =
+                        S.library.graphStatus[
+                          d.graph_status as keyof typeof S.library.graphStatus
+                        ] ?? d.graph_status;
+                      return (
+                        <li
+                          key={d.id}
+                          className="flex items-baseline justify-between gap-3 text-small"
+                        >
+                          <span className="min-w-0 truncate text-ink" title={d.filename}>
+                            {d.filename}
+                          </span>
+                          <span className="shrink-0 text-ink-2">
+                            {graph}
+                            {" · "}
+                            {S.library.inflightChunks(d.chunk_count)}
+                            {dropped > 0 && (
+                              <>
+                                {" · "}
+                                {S.library.dropsChip(dropped)}
+                              </>
+                            )}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
               </div>
             );
           })()}

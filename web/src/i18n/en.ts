@@ -514,6 +514,8 @@ export const en = {
     reExtract: "Re-extract",
     reprocess: "Reprocess",
     // 抽取进度（当前视图内聚合，SSE 推动刷新）
+    inflightChunks: (n: number) =>
+      n === 1 ? "1 chunk" : `${n} chunks`,
     extractProgress: (done: number, total: number) =>
       `Extracting · ${done} / ${total}`,
     // 失败详情：chip 可点开，不再只有 tooltip
@@ -1782,6 +1784,23 @@ export const en = {
       return `Last exploration: ${parts.join(" / ")}`;
     },
     lastRunMissing: "No exploration has run yet.",
+    runLive: "This round is still running",
+    runFailed: "This round failed",
+    runSources: (names: string) => `Sources: ${names}`,
+    runCovered: (n: number) =>
+      n === 1 ? "1 table covered" : `${n} tables covered`,
+    runDrop: (reason: string, n: number, example: string) =>
+      example ? `${reason} · ${n} · ${example}` : `${reason} · ${n}`,
+    dropReasons: {
+      source: "Source name did not match",
+      kind: "Not a metric or dimension",
+      type: "No matching class in the ontology",
+      definition: "Definition is not executable",
+      cap: "Over this round's cap",
+      decided: "Already decided",
+    },
+    dataDescription: "What the schema says",
+    dataQuestions: "Still open — the schema does not say",
     sourcesEmpty: "No data sources mounted.",
     sourcesNoneAvailable:
       "No data sources registered yet — ask a deployment admin to register one.",

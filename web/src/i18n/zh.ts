@@ -473,6 +473,7 @@ export const zh: Strings = {
     reprocess: "重新处理",
     extractProgress: (done: number, total: number) =>
       `抽取中 · ${done} / ${total}`,
+    inflightChunks: (n: number) => `${n} 个文本块`,
     errorTitle: "失败详情",
     errorParse: "摄入管道",
     errorGraph: "图谱抽取",
@@ -1566,6 +1567,22 @@ export const zh: Strings = {
       return `上一轮探索：${parts.join(" ／ ")}`;
     },
     lastRunMissing: "还没有跑过探索。",
+    runLive: "这一轮还在跑",
+    runFailed: "这一轮失败了",
+    runSources: (names: string) => `数据源：${names}`,
+    runCovered: (n: number) => `覆盖 ${n} 张表`,
+    runDrop: (reason: string, n: number, example: string) =>
+      example ? `${reason} ${n} 条 · ${example}` : `${reason} ${n} 条`,
+    dropReasons: {
+      source: "源名对不上",
+      kind: "不是指标或维度",
+      type: "本体里没有对应的类",
+      definition: "定义不可执行",
+      cap: "超过本轮上限",
+      decided: "这条已经表过态",
+    },
+    dataDescription: "从库结构写下的说明",
+    dataQuestions: "结构里还没写明、需要你答的",
     sourcesEmpty: "没有挂载任何数据源。",
     sourcesNoneAvailable: "还没有登记数据源——请部署管理员登记一个。",
     newConn: "登记新连接",

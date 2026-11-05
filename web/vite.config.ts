@@ -11,7 +11,17 @@ export default defineConfig({
     port: process.env.PORT ? Number(process.env.PORT) : 5173,
     proxy: {
       // 后端端口可用 UTOPIA_DEV_API 覆盖（默认 1516，与 .env 的 UTOPIA_BIND_ADDR 一致）
-      "/api": process.env.UTOPIA_DEV_API ?? "http://127.0.0.1:1516",
+      // 强制 x-forwarded-proto=http：若浏览器/环境带了 https，后端会给 cookie 打
+      // Secure，HTTP 页面下 cookie 被静默丢弃，表现为登录成功又回到登录页且无报错。
+      "/api": {
+        target: process.env.UTOPIA_DEV_API ?? "http://127.0.0.1:1516",
+        changeOrigin: true,
+        configure: (proxy) => {
+          proxy.on("proxyReq", (proxyReq) => {
+            proxyReq.setHeader("x-forwarded-proto", "http");
+          });
+        },
+      },
     },
   },
   test: {

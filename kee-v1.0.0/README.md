@@ -74,8 +74,9 @@ pnpm run dev --port 3030
 ```bash
 # API
 cd back
-lsof -t -i:8306 | xargs kill -9 2>/dev/null; clear
+
 source .venv/bin/activate
+lsof -t -i:8306 | xargs kill -9 2>/dev/null; clear && source .venv/bin/activate &&
 uvicorn app.main:app --reload --port 8306
 
 # Worker (separate terminal)

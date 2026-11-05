@@ -12,16 +12,50 @@ export class ApiError extends Error {
   }
 }
 
+/** 登录/注册响应里的 JWT。Cookie 在部分浏览器（Secure 误标、分区等）会丢，
+ *  请求时再带 Bearer，避免「登录 200 → 静默踢回登录页」且前后端都不报错。 */
+const SESSION_TOKEN_KEY = "utopia.session_token";
+
+export function setSessionToken(token: string | null) {
+  try {
+    if (token) sessionStorage.setItem(SESSION_TOKEN_KEY, token);
+    else sessionStorage.removeItem(SESSION_TOKEN_KEY);
+  } catch {
+    // 隐私模式等写不了 storage 时，仍依赖 cookie
+  }
+}
+
+function sessionToken(): string | null {
+  try {
+    return sessionStorage.getItem(SESSION_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/** 给不走 `request()` 的 fetch（聊天 SSE 等）补上同一套鉴权头。 */
+function withAuthHeaders(init?: HeadersInit): Headers {
+  const headers = new Headers(init);
+  const token = sessionToken();
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+  return headers;
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const headers = withAuthHeaders(init?.headers);
+  if (!(init?.body instanceof FormData) && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
   const res = await fetch(path, {
-    credentials: "include",
-    headers:
-      init?.body instanceof FormData
-        ? {}
-        : { "Content-Type": "application/json" },
     ...init,
+    credentials: "include",
+    headers,
   });
   if (!res.ok) {
+    // 会话失效：清掉兜底 token，否则会一直带着废票
+    if (res.status === 401) setSessionToken(null);
     // 措辞在这一个收口点定：22 个文件里的 toast.error(e.message) 一处都不用改。
     // 有 code 就查 i18n，没有（或这一条还没进表）就退回服务端的英文原句——
     // 服务端永远说英文，因为界面语言在客户端（docs/decisions/0004）
@@ -119,6 +153,10 @@ export interface Kb {
   /** 内置本体按哪种语言播种、新描述写哪种语言。**跟语料走，不跟界面走**
       （界面语言在客户端，见 docs/decisions/0004） */
   ontology_lang: "en" | "zh";
+  /** 探索从库表结构写下的说明；每次探索重写 */
+  data_description?: string | null;
+  /** 结构里答不上、需要主人补充的问题 */
+  data_questions?: string[];
   /** 调用者在本库的角色（仅详情接口返回）：前端据此门控破坏性入口 */
   my_role?: "viewer" | "editor" | "admin" | "owner" | null;
 }
@@ -1452,18 +1490,37 @@ export const api = {
     }),
   alertsReadAll: () =>
     request<{ ok: boolean }>("/api/v1/alerts/read-all", { method: "POST" }),
-  login: (email: string, password: string) =>
-    request<{ user: User }>("/api/v1/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    }),
-  register: (email: string, password: string, displayName: string) =>
-    request<{ user: User; workspace: Workspace }>("/api/v1/auth/register", {
-      method: "POST",
-      body: JSON.stringify({ email, password, display_name: displayName }),
-    }),
-  logout: () =>
-    request<{ ok: boolean }>("/api/v1/auth/logout", { method: "POST" }),
+  login: async (email: string, password: string) => {
+    const data = await request<{ user: User; token: string }>(
+      "/api/v1/auth/login",
+      {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      },
+    );
+    setSessionToken(data.token);
+    return data;
+  },
+  register: async (email: string, password: string, displayName: string) => {
+    const data = await request<{ user: User; workspace: Workspace; token: string }>(
+      "/api/v1/auth/register",
+      {
+        method: "POST",
+        body: JSON.stringify({ email, password, display_name: displayName }),
+      },
+    );
+    setSessionToken(data.token);
+    return data;
+  },
+  logout: async () => {
+    try {
+      return await request<{ ok: boolean }>("/api/v1/auth/logout", {
+        method: "POST",
+      });
+    } finally {
+      setSessionToken(null);
+    }
+  },
   updateMe: (displayName: string) =>
     request<User>("/api/v1/auth/me", {
       method: "PATCH",
@@ -2618,6 +2675,7 @@ export function reattachChat(
     (signal) =>
       fetch(`/api/v1/kbs/${kbId}/conversations/${conversationId}/stream`, {
         credentials: "include",
+        headers: withAuthHeaders(),
         signal,
       }),
     handlers,
@@ -2635,7 +2693,7 @@ export function streamChat(
       fetch(`/api/v1/kbs/${kbId}/chat`, {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: withAuthHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify(body),
         signal,
       }),
