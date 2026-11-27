@@ -5,6 +5,7 @@ pub mod access;
 pub mod accounts;
 pub mod agent_reviews;
 pub mod alerts;
+pub mod alignment_gate;
 pub mod alignment_queue;
 pub mod audit;
 pub mod business_rules;

@@ -1,9 +1,9 @@
 # KEE V0.2 — Ontology Runtime 技术增强与研发实施规范
 
-> 状态：Proposed / 待研发评审；文档版本 v0.2.0；编制日期：2026-11-27  
+> 状态：Proposed / 待研发评审；文档版本 v0.2.1；编制日期：2026-11-27  
 > 适用仓库：`vaelephant/300-6-KEE`（以 `KEE/` 为实际工程根目录）  
 > 交付性质：**仅技术规划和研发验收规范，不代表已实现，不授权改动现有代码**  
-> 对标参考：[TrustGraph](https://github.com/trustgraph-ai/trustgraph)（Apache-2.0）；参考其标准与契约，不直接引入整套服务。
+> 对标立场：**以 KEE 现有架构与契约为唯一真源**；[TrustGraph](https://github.com/trustgraph-ai/trustgraph)（Apache-2.0）仅作能力与标准语义的借鉴对象，不引入其服务栈，不以追平其对等实现为验收条件。
 
 ## 0. 执行摘要与不可变约束
 
@@ -18,6 +18,29 @@
 5. **无静默放行**：内部策略校验错误、缺失用户上下文、跨 KB 查询和授权解析失败一律 fail closed；审计可用性故障依风险等级进入显式拒绝/降级模式。
 6. **许可证合规**：保留原始项目版权、NOTICE/许可证义务；不得把借鉴 TrustGraph 的标准设计描述为复制代码。上游 `deeplethe/utopia` 关系与后续自研代码的知识产权在正式交付前清点。
 7. **开发边界**：本文件仅规定实施方案；各阶段必须通过测试门槛和 ADR 审核后才进入编码，不以「模块存在」替代「行为已验证」。
+
+### 0.1 TrustGraph 对照（借鉴清单，不改变 P0 范围）
+
+**立场**：V0.2 要增强的是 KEE 自己的对齐校验、证据 Trace、细粒度策略与有界查询；TrustGraph 提供「业界在谈什么能力」的参照，**不是移植蓝图**。下列动作分类：
+
+- **adapt**：借鉴语义或验收口径，按 KEE 既有模块与契约实现  
+- **defer**：明确不做或放 P1/Spike，不进入本里程碑必做范围  
+- **reject**：与 KEE 不可变约束冲突，刻意不跟
+
+| TrustGraph 能力 | KEE 既有基础 | V0.2 动作 | 落点 |
+| --- | --- | --- | --- |
+| OntologyRAG（抽取时按本体引导） | 开放抽取 → 对齐 → 类型化事实 | **reject**（抽取不塞本体） | 原则 2；校验在 OR-01 对齐期 |
+| 抽取后 domain/range/subclass 校验 | `kee-reason` ontology、phrase/type alignment | **adapt** | OR-01（P0） |
+| PROV-O / explain trace | provenance、RDF 导出、检索/聊天路径 | **adapt** | OR-02（P0） |
+| SHACL-AF：Allow / Filter / Violation | KB RBAC、`access`、审计 | **adapt** 三态语义；**reject** 以 SHACL-AF 作 IAM 真源 | OR-03（P0） |
+| 无策略时 open mode | fail-closed 原则 | **reject** | 原则 5 |
+| Guided graph traversal | retrieval / search | **adapt**（有界 hops/nodes/timeout） | OR-06（P1） |
+| SPARQL 1.1 全量查询 | RDF 导出、graph API | **defer**（先有界 API，再评估只读子集 adapter） | OR-04（P1 Spike） |
+| Context Cores / workspace `.tgx` | RDF/PROV 导出 | **adapt** 为 KEE Context Package v0.1；不承诺对等格式 | OR-05（P1 Spike） |
+| Cassandra + Qdrant + Pulsar/RabbitMQ 微服务 | PG/pgvector + Tantivy 单体 | **reject** | 原则 1 |
+| 完整 OWL DL reasoner | 规则/前向派生 | **defer**（本里程碑不做） | 「不做」清单 |
+
+**评审口径**：对照表只解释「为什么借鉴 / 为什么不跟」；**P0 仍仅为 OR-01 / OR-02 / OR-03**，不以 TrustGraph 功能清单扩容。
 
 ## 1. 当前基线与工程证据（2026-11-27 静态检查）
 
@@ -214,8 +237,8 @@ KEE Server：身份解析 → KB 角色/Token Scope → Policy Decision Point
 
 - 本仓库：`KEE/docs/design/{ontology,extraction,ledger,rules,access-and-audit,chat-and-mcp}.md`
 - 现有决策：`KEE/docs/decisions/{0012,0019,0020,0040,0044,0046,0062}-*.md`（根据现存文件名核对）
-- TrustGraph：[README](https://github.com/trustgraph-ai/trustgraph/blob/master/README.md)；其 RDF/OWL/SHACL/PROV-O/GraphRAG 架构供对标，不表示 KEE 已实现同等能力。
-- 标准：W3C RDF 1.1、OWL 2、PROV-O、SHACL、SPARQL 1.1；按各自标准范围逐项验证，不以单一库的实现替代规范。
+- TrustGraph：[README](https://github.com/trustgraph-ai/trustgraph/blob/master/README.md)；仅供标准语义与能力参照，详见 §0.1；不表示 KEE 已实现或计划追平同等能力。
+- 标准：W3C RDF 1.1、OWL 2、PROV-O、SHACL、SPARQL 1.1；按各自标准范围与 KEE 契约逐项验证，不以任一外部项目的实现替代规范或验收。
 
 ---
 
