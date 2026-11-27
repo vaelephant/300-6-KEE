@@ -67,6 +67,10 @@ struct Due {
     direction: String,
     subject_id: Uuid,
     object_id: Option<Uuid>,
+    /// 主语当前类（OR-01 校验用）；未分类按 0009 / 0076 送审，不作硬不匹配
+    subject_type_id: Option<Uuid>,
+    /// 宾语当前类；字面值宾语为 NULL
+    object_type_id: Option<Uuid>,
     /// 宾语是实体时它的名字：绑到文本属性上，名字就是值（0044 修订 2026-10-22）
     object_name: Option<String>,
     object_value: Option<serde_json::Value>,
@@ -241,7 +245,9 @@ async fn materialize_in_tx(
     //    且谓词相同。reverse 只对两样东西之间的关系有意义（字面值当不了主语）
     let due: Vec<Due> = sqlx::query_as(&format!(
         "SELECT s.id AS statement, b.relation_type_id AS property, b.direction,
-                s.subject_id, s.object_id, oe.canonical_name AS object_name, s.object_value,
+                s.subject_id, s.object_id,
+                se.type_id AS subject_type_id, oe.type_id AS object_type_id,
+                oe.canonical_name AS object_name, s.object_value,
                 s.valid_from, s.valid_from_precision, s.valid_from_grade,
                 s.valid_to, s.valid_to_precision,
                 s.attested_from, s.confidence, b.marks,
@@ -270,10 +276,61 @@ async fn materialize_in_tx(
     .fetch_all(&mut **tx)
     .await?;
 
+    let gate = if crate::alignment_gate::v2_enabled() {
+        Some(crate::alignment_gate::load_ontology_snap(tx, kb_id).await?)
+    } else {
+        None
+    };
+
     let (mut added, mut merged) = (0u64, 0u64);
     // 绑上了却按 datatype 读不出的值：(陈述, 属性, 原文的字)，收尾时记成丢弃行
     let mut unreadable: Vec<(Uuid, Uuid, String)> = Vec::new();
     for d in &due {
+        if let Some(snap) = gate.as_ref() {
+            let direction = match d.direction.as_str() {
+                "reverse" => kee_reason::alignment_validation::Direction::Reverse,
+                _ => kee_reason::alignment_validation::Direction::Forward,
+            };
+            let value_shape_ok = if d.kind == "attribute" {
+                let named_value = d
+                    .object_name
+                    .as_deref()
+                    .map(|n| serde_json::json!({ "value": n }));
+                let object_value = named_value.as_ref().or(d.object_value.as_ref());
+                object_value.map(|value| {
+                    attribute_value(value, d.datatype.as_deref(), d.unit.as_deref()).is_some()
+                })
+            } else {
+                None
+            };
+            let ends = crate::alignment_gate::DueEnds {
+                property: d.property,
+                direction,
+                subject_type: d.subject_type_id,
+                object_type: d.object_type_id,
+                object_is_value: d.object_id.is_none(),
+                kind: d.kind.clone(),
+                datatype: d.datatype.clone(),
+                unit: d.unit.clone(),
+                value_shape_ok,
+            };
+            let outcome = crate::alignment_gate::validate_due(&ends, snap);
+            if crate::alignment_gate::blocks_typing(&outcome) {
+                tracing::info!(
+                    kb_id = %kb_id,
+                    statement = %d.statement,
+                    property = %d.property,
+                    decision = outcome.decision.as_str(),
+                    reasons = ?outcome
+                        .reasons
+                        .iter()
+                        .map(|r| r.as_str())
+                        .collect::<Vec<_>>(),
+                    "alignment_validation_v2 blocked typing"
+                );
+                continue;
+            }
+        }
         let reverse = d.direction == "reverse";
         // 一刻的陈述在状态属性下按绑定说的读（#966、0053 修订 2026-10-22）：开始写成从那一刻
         // 起，结束写成到那一刻为止（走 `insert_fact_on`「某天结束了」那条路，关上开放的那段），

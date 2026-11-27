@@ -291,11 +291,11 @@ async fn a_purge_is_final() -> anyhow::Result<()> {
         assert_ne!(again.id, a, "a new document, not a revival");
         assert!(again.deleted_at.is_none());
         let deleted = documents::page(&pool, f.kb, None, None, None, true, 50, 0).await?;
-        let ids: Vec<Uuid> = deleted.docs.iter().map(|d| d.id).collect();
+        let ids: Vec<Uuid> = deleted.docs.iter().map(|d| d.document.id).collect();
         assert_eq!(ids, vec![b], "purged tombstones are not listed");
         assert_eq!(deleted.deleted, 1);
         let live = documents::page(&pool, f.kb, None, None, None, false, 50, 0).await?;
-        let ids: Vec<Uuid> = live.docs.iter().map(|d| d.id).collect();
+        let ids: Vec<Uuid> = live.docs.iter().map(|d| d.document.id).collect();
         assert!(ids.contains(&again.id));
         assert!(!ids.contains(&a) && !ids.contains(&b));
         Ok::<_, anyhow::Error>(())

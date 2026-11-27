@@ -12,6 +12,7 @@
 //! 没声明就不查——不报矛盾比猜一个公理出来安全。所以一个没装本体包的库跑出来
 //! 是零，那是实情不是故障。
 
+pub mod alignment_validation;
 pub mod derive;
 pub mod expressions;
 pub mod ontology;

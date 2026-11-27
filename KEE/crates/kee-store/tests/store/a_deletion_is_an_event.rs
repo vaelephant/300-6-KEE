@@ -187,7 +187,7 @@ async fn listed(pool: &PgPool, f: &Fx, id: Uuid) -> anyhow::Result<bool> {
         .await?
         .docs
         .iter()
-        .any(|d| d.id == id))
+        .any(|d| d.document.id == id))
 }
 
 #[tokio::test]

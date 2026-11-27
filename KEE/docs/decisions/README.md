@@ -44,6 +44,7 @@ By domain; the domains are the files of [../design/](../design/README.md). **Sta
 | 0061 | [The ontology is proposed from the open graph and judged by its questions](0061-the-ontology-is-proposed-from-the-open-graph-and-judged-by-its-questions.md) | In progress |  |
 | 0062 | [The export says what is contested](0062-the-export-says-what-is-contested.md) | Implemented |  |
 | 0073 | [A scenario pack is a vocabulary with its questions](0073-a-scenario-pack-is-a-vocabulary-with-its-questions.md) | In progress |  |
+| 0076 | [Alignment validation names why a candidate may not type](0076-alignment-validation-names-why-a-candidate-may-not-type.md) | In progress |  |
 
 ### [extraction](../design/extraction.md)
 
