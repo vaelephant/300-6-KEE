@@ -330,13 +330,57 @@ pub async fn decide(
     sig: &PhraseSignature,
     d: Decision<'_>,
 ) -> AppResult<bool> {
+    decide_validated(pool, kb_id, sig, d, None).await
+}
+
+/// Like [`decide`], then persist an OR-01 validation outcome on the same row (0076).
+/// `decide_on` clears codes; this writes them back in the same transaction.
+pub async fn decide_validated(
+    pool: &PgPool,
+    kb_id: Uuid,
+    sig: &PhraseSignature,
+    d: Decision<'_>,
+    validation: Option<&kee_reason::alignment_validation::ValidationOutcome>,
+) -> AppResult<bool> {
     validate_decision(sig, &d)?;
-    // The observed regression outcome belongs to this decision, not to a later read that
-    // could see a different person's binding. Commit both together, as delivery already does.
     let mut tx = pool.begin().await?;
     let changed = decide_on(&mut tx, kb_id, sig, d).await?;
+    if changed {
+        if let Some(outcome) = validation {
+            if let Some(id) = id_of_signature_tx(&mut tx, kb_id, sig).await? {
+                set_validation_outcome_tx(&mut tx, id, outcome).await?;
+            }
+        }
+    }
     tx.commit().await?;
     Ok(changed)
+}
+
+async fn id_of_signature_tx(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    kb_id: Uuid,
+    sig: &PhraseSignature,
+) -> AppResult<Option<Uuid>> {
+    let phrase = normalize(&sig.phrase);
+    let object_type = if sig.object_is_value {
+        None
+    } else {
+        sig.object_type_id
+    };
+    Ok(sqlx::query_scalar(
+        "SELECT id FROM phrase_bindings
+          WHERE kb_id = $1 AND phrase = $2
+            AND subject_type_id IS NOT DISTINCT FROM $3
+            AND object_type_id IS NOT DISTINCT FROM $4
+            AND object_is_value = $5",
+    )
+    .bind(kb_id)
+    .bind(phrase)
+    .bind(sig.subject_type_id)
+    .bind(object_type)
+    .bind(sig.object_is_value)
+    .fetch_optional(&mut **tx)
+    .await?)
 }
 
 fn validate_decision(sig: &PhraseSignature, d: &Decision<'_>) -> AppResult<String> {

@@ -19,11 +19,14 @@ use crate::llm_util;
 use crate::state::AppState;
 use sha2::{Digest, Sha256};
 use std::collections::{HashMap, HashSet};
+use std::sync::Arc;
 use kee_core::models::RelationTypeView;
 use kee_extract::phrase_align::{
     build_phrase_messages, parse_phrase_response, Direction, Marks, PhraseItem, PropertyCandidate,
 };
+use kee_store::alignment_gate::{self, OntologySnap};
 use kee_store::phrase_bindings::{self, Decision, PhraseSignature};
+use kee_reason::alignment_validation::Direction as ValDirection;
 use uuid::Uuid;
 
 /// 一次问多少条签名。
@@ -34,6 +37,88 @@ const CANDIDATE_LIMIT: usize = 60;
 /// 一票：这条签名选了哪个属性、哪个方向，属性是状态时还有一刻标哪一端（#966）。
 /// None = 没有属性对得上
 type Vote = Option<(String, Direction, Option<Marks>)>;
+
+/// OR-01：意图写成 bound 时先跑校验；硬拒绝 → none，送审 → undecided，并通过
+/// [`phrase_bindings::decide_validated`] 落下 reason_codes。开关关着时行为与从前相同。
+/// 返回写入的 status；人挡代理时为 `None`。
+async fn decide_intended_bound(
+    pool: &sqlx::PgPool,
+    kb_id: Uuid,
+    sig: &PhraseSignature,
+    property: &RelationTypeView,
+    direction: Direction,
+    votes: &serde_json::Value,
+    decided_by: &str,
+    basis: Option<&str>,
+    marks: Option<&str>,
+    marks_asked: bool,
+    snap: Option<&OntologySnap>,
+) -> kee_core::AppResult<Option<&'static str>> {
+    let Some(snap) = snap else {
+        let changed = phrase_bindings::decide(
+            pool,
+            kb_id,
+            sig,
+            Decision {
+                relation_type_id: Some(property.id),
+                direction: Some(direction.as_str()),
+                status: "bound",
+                votes,
+                decided_by,
+                basis,
+                marks,
+                marks_asked,
+            },
+        )
+        .await?;
+        return Ok(changed.then_some("bound"));
+    };
+    let val_dir = match direction {
+        Direction::Forward => ValDirection::Forward,
+        Direction::Reverse => ValDirection::Reverse,
+    };
+    let ends = alignment_gate::ends_for_signature(
+        property.id,
+        val_dir,
+        sig.subject_type_id,
+        sig.object_type_id,
+        sig.object_is_value,
+        &property.kind,
+        property.datatype.clone(),
+        property.unit.clone(),
+    );
+    let outcome = alignment_gate::validate_due(&ends, snap);
+    let write = alignment_gate::align_write_for_bound(outcome);
+    let (relation_type_id, direction_s, marks_s, marks_asked_s) = if write.keep_binding {
+        (
+            Some(property.id),
+            Some(direction.as_str()),
+            marks,
+            marks_asked,
+        )
+    } else {
+        (None, None, None, false)
+    };
+    let status = write.status;
+    let changed = phrase_bindings::decide_validated(
+        pool,
+        kb_id,
+        sig,
+        Decision {
+            relation_type_id,
+            direction: direction_s,
+            status,
+            votes,
+            decided_by,
+            basis,
+            marks: marks_s,
+            marks_asked: marks_asked_s,
+        },
+        Some(&write.outcome),
+    )
+    .await?;
+    Ok(changed.then_some(status))
+}
 
 /// 代理绑到状态属性、却从没问过一刻标哪一端的绑定（这一列之前的判定，#966）：指纹没变也问
 /// 一次，只问这一格，不重判绑定（0053 修订 2026-09-27）。问过的不再问，没得到值的列进对齐
@@ -263,6 +348,11 @@ pub(crate) async fn bind_declared(
     if keys.is_empty() {
         return Ok(0);
     }
+    let snap = if alignment_gate::v2_enabled() {
+        Some(alignment_gate::load_ontology_snap_pool(pool, kb_id).await?)
+    } else {
+        None
+    };
     let mut written = 0;
     for s in phrase_bindings::signatures(pool, kb_id)
         .await?
@@ -272,22 +362,22 @@ pub(crate) async fn bind_declared(
         let Some(p) = declared(s, &props, &closure) else {
             continue;
         };
-        if phrase_bindings::decide(
+        let votes = serde_json::json!({ "reason": "declared_relation" });
+        if decide_intended_bound(
             pool,
             kb_id,
             s,
-            Decision {
-                relation_type_id: Some(p.id),
-                direction: Some(Direction::Forward.as_str()),
-                status: "bound",
-                votes: &serde_json::json!({ "reason": "declared_relation" }),
-                decided_by: "ontology",
-                basis: None,
-                marks: None,
-                marks_asked: false,
-            },
+            p,
+            Direction::Forward,
+            &votes,
+            "ontology",
+            None,
+            None,
+            false,
+            snap.as_ref(),
         )
         .await?
+        .is_some()
         {
             written += 1;
         }
@@ -779,6 +869,13 @@ async fn align_phrases_locked(
     let by_key: HashMap<&str, &RelationTypeView> =
         props.iter().map(|p| (p.key.as_str(), p)).collect();
     let closure = closures(classes.iter().map(|c| (c.id, c.parents.as_slice())));
+    let validation_snap: Option<Arc<OntologySnap>> = if alignment_gate::v2_enabled() {
+        Some(Arc::new(
+            alignment_gate::load_ontology_snap_pool(pool, kb_id).await?,
+        ))
+    } else {
+        None
+    };
     let versions = phrase_bindings::property_versions(pool, kb_id).await?;
     let sigs = phrase_bindings::signatures(pool, kb_id).await?;
     let existing: HashMap<_, _> = phrase_bindings::bindings(pool, kb_id)
@@ -894,7 +991,9 @@ async fn align_phrases_locked(
         let futures: Vec<_> = batches
             .iter()
             .map(|batch| batch.as_slice())
-            .map(|batch| async move {
+            .map(|batch| {
+                let validation_snap = validation_snap.clone();
+                async move {
                 let (mut bound, mut none, mut undecided, mut skipped, mut failed, mut unanswered) =
                     (0usize, 0usize, 0usize, 0usize, 0usize, 0usize);
                 let (mut marked, mut unsettled) = (0usize, 0usize);
@@ -1149,7 +1248,9 @@ async fn align_phrases_locked(
                 _ => false,
             };
             if !agree || invalid_direction {
-                phrase_bindings::decide(
+                let ambiguous = alignment_gate::v2_enabled()
+                    .then(alignment_gate::ambiguous_outcome);
+                phrase_bindings::decide_validated(
                     pool,
                     kb_id,
                     s,
@@ -1163,6 +1264,7 @@ async fn align_phrases_locked(
                         marks: None,
                         marks_asked: false,
                     },
+                    ambiguous.as_ref(),
                 )
                 .await?;
                 undecided += 1;
@@ -1185,26 +1287,31 @@ async fn align_phrases_locked(
                 .and_then(|(k, d, _)| by_key.get(k.as_str()).map(|p| (p, *d)))
             {
                 Some((p, d)) => {
-                    if phrase_bindings::decide(
+                    if let Some(status) = decide_intended_bound(
                         pool,
                         kb_id,
                         s,
-                        Decision {
-                            relation_type_id: Some(p.id),
-                            direction: Some(d.as_str()),
-                            status: "bound",
-                            votes: &record,
-                            decided_by: "agent",
-                            basis: Some(basis),
-                            marks: marks.map(Marks::as_str),
-                            marks_asked: state,
-                        },
+                        p,
+                        d,
+                        &record,
+                        "agent",
+                        Some(basis),
+                        marks.map(Marks::as_str),
+                        state,
+                        validation_snap.as_deref(),
                     )
                     .await?
                     {
-                        bound += 1;
-                        if state && marks.is_none() {
-                            unsettled += 1;
+                        match status {
+                            "bound" => {
+                                bound += 1;
+                                if state && marks.is_none() {
+                                    unsettled += 1;
+                                }
+                            }
+                            "none" => none += 1,
+                            "undecided" => undecided += 1,
+                            _ => {}
                         }
                     }
                 }
@@ -1236,6 +1343,7 @@ async fn align_phrases_locked(
                     (bound, none, undecided, skipped, failed, unanswered),
                     (marked, unsettled),
                 ))
+                }
             })
             .collect();
         let mut results = futures_util::stream::iter(futures).buffer_unordered(PARALLEL_BATCHES);

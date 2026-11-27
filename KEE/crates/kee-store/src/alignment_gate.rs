@@ -144,6 +144,78 @@ pub fn blocks_typing(outcome: &ValidationOutcome) -> bool {
     !outcome.decision.may_materialize()
 }
 
+/// How an intended `bound` write should be stored after OR-01 validation.
+#[derive(Debug, Clone)]
+pub struct AlignWrite {
+    pub status: &'static str,
+    pub keep_binding: bool,
+    pub outcome: ValidationOutcome,
+}
+
+/// Re-shape an agent/ontology intent to `bound` using the closed reason codes.
+///
+/// - [`Decision::Accepted`] → still `bound`
+/// - [`Decision::NeedsReview`] → `undecided`, drop property (queue a person)
+/// - [`Decision::Rejected`] → `none`, drop property (open statement kept)
+pub fn align_write_for_bound(outcome: ValidationOutcome) -> AlignWrite {
+    match outcome.decision {
+        Decision::Accepted => AlignWrite {
+            status: "bound",
+            keep_binding: true,
+            outcome,
+        },
+        Decision::NeedsReview => AlignWrite {
+            status: "undecided",
+            keep_binding: false,
+            outcome,
+        },
+        Decision::Rejected => AlignWrite {
+            status: "none",
+            keep_binding: false,
+            outcome,
+        },
+    }
+}
+
+/// Ambiguous / disagreeing votes → needs_review with [`ReasonCode::AmbiguousBinding`].
+pub fn ambiguous_outcome() -> ValidationOutcome {
+    ValidationOutcome {
+        decision: Decision::NeedsReview,
+        reasons: vec![ReasonCode::AmbiguousBinding],
+    }
+}
+
+/// Build a candidate for a signature about to bind `property` in `direction`.
+pub fn ends_for_signature(
+    property: Uuid,
+    direction: Direction,
+    subject_type: Option<Uuid>,
+    object_type: Option<Uuid>,
+    object_is_value: bool,
+    kind: &str,
+    datatype: Option<String>,
+    unit: Option<String>,
+) -> DueEnds {
+    DueEnds {
+        property,
+        direction,
+        subject_type,
+        object_type: if object_is_value { None } else { object_type },
+        object_is_value,
+        kind: kind.to_string(),
+        datatype,
+        unit,
+        value_shape_ok: None,
+    }
+}
+
+pub async fn load_ontology_snap_pool(pool: &sqlx::PgPool, kb_id: Uuid) -> AppResult<OntologySnap> {
+    let mut tx = pool.begin().await?;
+    let snap = load_ontology_snap(&mut tx, kb_id).await?;
+    tx.commit().await?;
+    Ok(snap)
+}
+
 pub use alignment_validation::{Decision, ReasonCode};
 
 #[cfg(test)]
@@ -191,6 +263,28 @@ mod tests {
         assert_eq!(out.decision, Decision::Rejected);
         assert!(out.reasons.contains(&ReasonCode::DomainMismatch));
         assert!(blocks_typing(&out));
+    }
+
+    #[test]
+    fn rejected_bound_intent_becomes_none() {
+        let out = ValidationOutcome {
+            decision: Decision::Rejected,
+            reasons: vec![ReasonCode::DomainMismatch],
+        };
+        let w = align_write_for_bound(out);
+        assert_eq!(w.status, "none");
+        assert!(!w.keep_binding);
+    }
+
+    #[test]
+    fn review_bound_intent_becomes_undecided() {
+        let out = ValidationOutcome {
+            decision: Decision::NeedsReview,
+            reasons: vec![ReasonCode::UnknownEndpointType],
+        };
+        let w = align_write_for_bound(out);
+        assert_eq!(w.status, "undecided");
+        assert!(!w.keep_binding);
     }
 
     #[test]

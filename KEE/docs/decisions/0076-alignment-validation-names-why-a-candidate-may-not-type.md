@@ -1,6 +1,6 @@
 # 0076 · Alignment validation names why a candidate may not type
 
-- **Status**: In progress 2026-11-27 · open: phrase-align-time emission of codes, per-KB flag (env `KEE_ALIGNMENT_VALIDATION_V2` + columns on `phrase_bindings` shipped), human hard-override UX
+- **Status**: In progress 2026-11-27 · open: per-KB flag (env `KEE_ALIGNMENT_VALIDATION_V2` still process-wide), human hard-override UX, review API surfacing of `reason_codes`
 - **Written**: 2026-11-27
 - **Related**: [0012](0012-the-ontology-is-a-contract-not-a-suggestion.md); [0044](0044-the-ontology-is-a-view-over-what-documents-say.md) decisions 2–3; [0051](0051-a-human-phrase-decision-carries-its-materialization-work.md); [0053](0053-a-phrase-decision-records-the-inputs-it-considered.md); plan [`KEE-V0.2-ONTOLOGY-RUNTIME`](../plans/KEE-V0.2-ONTOLOGY-RUNTIME.md) OR-01; baseline [`KEE-V0.2-W0-BASELINE-AUDIT`](../plans/KEE-V0.2-W0-BASELINE-AUDIT.md)
 
@@ -96,3 +96,4 @@ Industry packs (e.g. HCC) must not hard-code clinical rules into the validator; 
 - 2026-11-27: Proposed after W0 baseline audit on `d9c5ae1`; awaiting review before coding.
 - 2026-11-27: In progress — `kee_reason::alignment_validation` + `kee_store::alignment_gate` pre-materialise guard behind `KEE_ALIGNMENT_VALIDATION_V2`.
 - 2026-11-27: Migration 0129 adds `phrase_bindings.reason_codes` + `validation_decision`; materialise writes them when the v2 gate runs.
+- 2026-11-27: Phrase alignment (agent + declared ontology binds) validates before write; hard reject → `none`, review → `undecided`, with durable codes; disagree votes get `AMBIGUOUS_BINDING`.
