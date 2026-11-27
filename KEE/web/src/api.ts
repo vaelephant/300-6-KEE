@@ -855,6 +855,10 @@ export type AlignmentItem =
        *  两票不一致的条目两个都是 null */
       bound_to: string | null;
       direction: "forward" | "reverse" | null;
+      /** OR-01：稳定校验码；空数组 = 未跑过或已通过 */
+      reason_codes?: string[];
+      /** `accepted` / `needs_review` / `rejected` */
+      validation_decision?: string | null;
     }
   | {
       kind: "kind_word";

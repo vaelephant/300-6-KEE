@@ -34,6 +34,10 @@ pub enum AlignmentItem {
         /// 都是 None
         bound_to: Option<String>,
         direction: Option<String>,
+        /// OR-01 / 0076：稳定校验码；空 = 未跑过 v2 或已通过
+        reason_codes: Vec<String>,
+        /// `accepted` / `needs_review` / `rejected`；未跑过 v2 时为 None
+        validation_decision: Option<String>,
     },
     KindWord {
         kind_word: String,
@@ -92,6 +96,8 @@ struct PhraseRow {
     decided_at: DateTime<Utc>,
     bound_to: Option<String>,
     direction: Option<String>,
+    reason_codes: Vec<String>,
+    validation_decision: Option<String>,
 }
 
 /// 等人定的短语签名：两票不一致的，加上绑到状态属性、却没说一刻标哪一端的（#966）——人绑的
@@ -102,7 +108,9 @@ pub(crate) const WAITING_PHRASE: &str = "(b.status = 'undecided'
        OR (b.status = 'bound' AND b.marks IS NULL
            AND (b.decided_by = 'person' OR b.marks_asked_at IS NOT NULL)
            AND EXISTS (SELECT 1 FROM relation_types rt
-                        WHERE rt.id = b.relation_type_id AND rt.temporal = 'state')))";
+                        WHERE rt.id = b.relation_type_id AND rt.temporal = 'state'))
+       -- OR-01 / 0076：校验硬拒绝写成 none 并带 reason_codes，也进队列等人改判
+       OR (b.status = 'none' AND cardinality(b.reason_codes) > 0))";
 
 #[derive(sqlx::FromRow)]
 struct KindWordRow {
@@ -123,7 +131,8 @@ pub async fn list(
         "SELECT b.id, b.phrase, st.key AS subject_class, ot.key AS object_class,
                 b.object_is_value, b.statement_count, b.examples, b.votes, b.decided_at,
                 CASE WHEN b.status = 'bound' THEN p.key END AS bound_to,
-                CASE WHEN b.status = 'bound' THEN b.direction END AS direction
+                CASE WHEN b.status = 'bound' THEN b.direction END AS direction,
+                b.reason_codes, b.validation_decision
            FROM phrase_bindings b
       LEFT JOIN entity_types st ON st.id = b.subject_type_id
       LEFT JOIN entity_types ot ON ot.id = b.object_type_id
@@ -176,6 +185,8 @@ pub async fn list(
                     decided_at: r.decided_at,
                     bound_to: r.bound_to,
                     direction: r.direction,
+                    reason_codes: r.reason_codes,
+                    validation_decision: r.validation_decision,
                 },
             )
         })

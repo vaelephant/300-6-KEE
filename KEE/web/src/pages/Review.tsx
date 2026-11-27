@@ -1,5 +1,6 @@
 import { alignmentErrorMessage } from "./reviewErrors";
 import { asksMarks, phraseStart } from "./alignmentPhrase";
+import { reasonCodeLabel, validationDecisionLabel } from "./alignmentReasons";
 import { useEffect, useState } from "react";
 import { LayoutDashboard } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -29,7 +30,7 @@ import {
 import { fmtTime, parseDateInput } from "../time";
 import { PendingFactRow, useCanDecide } from "./PendingFacts";
 import { ReviewOverview } from "./ReviewOverview";
-import { S } from "../i18n";
+import { lang, S } from "../i18n";
 import { useKb, useKbId } from "../kb";
 import { toast } from "../toast";
 import {
@@ -893,6 +894,27 @@ function AlignmentPhraseRow({
       {item.votes?.reason === "too_many_candidates" && (
         <div className="mt-1 text-small text-ink-2">
           {S.review.alignmentTooMany(item.votes?.candidates ?? 0)}
+        </div>
+      )}
+      {/* OR-01 / 0076：稳定 reason_codes，给人看清为何未物化 */}
+      {(item.reason_codes?.length ?? 0) > 0 && (
+        <div className="mt-1 text-small text-amber-800 dark:text-amber-200">
+          <span className="font-medium">{S.review.alignmentValidation}</span>
+          {validationDecisionLabel(item.validation_decision, lang) && (
+            <span>
+              {" · "}
+              {validationDecisionLabel(item.validation_decision, lang)}
+            </span>
+          )}
+          <ul className="mt-0.5 list-disc pl-4">
+            {item.reason_codes!.map((code) => (
+              <li key={code}>
+                <code className="text-xs">{code}</code>
+                {" — "}
+                {reasonCodeLabel(code, lang)}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
       <div className={CARD_ACTIONS}>
