@@ -18,6 +18,8 @@
 //! 少这一步——否则一个函数型属性的两个值各开着一段，后一次观察关不上前一次。重算
 //! 提交之后再对账：对账按时间线各自开事务、拿自己的锁，不在物化的事务里做
 
+use std::collections::HashSet;
+
 use sqlx::PgPool;
 use kee_core::AppResult;
 use uuid::Uuid;
@@ -63,6 +65,8 @@ pub struct Outcome {
 #[derive(sqlx::FromRow)]
 struct Due {
     statement: Uuid,
+    /// phrase_bindings 行，守卫写 reason_codes 时按它更新
+    binding_id: Uuid,
     property: Uuid,
     direction: String,
     subject_id: Uuid,
@@ -244,7 +248,7 @@ async fn materialize_in_tx(
     // 3. 该有而没有的（陈述, 绑定）对：陈述活着、签名绑着、没 mood、还没有活着的行以它为来源
     //    且谓词相同。reverse 只对两样东西之间的关系有意义（字面值当不了主语）
     let due: Vec<Due> = sqlx::query_as(&format!(
-        "SELECT s.id AS statement, b.relation_type_id AS property, b.direction,
+        "SELECT s.id AS statement, b.id AS binding_id, b.relation_type_id AS property, b.direction,
                 s.subject_id, s.object_id,
                 se.type_id AS subject_type_id, oe.type_id AS object_type_id,
                 oe.canonical_name AS object_name, s.object_value,
@@ -285,6 +289,8 @@ async fn materialize_in_tx(
     let (mut added, mut merged) = (0u64, 0u64);
     // 绑上了却按 datatype 读不出的值：(陈述, 属性, 原文的字)，收尾时记成丢弃行
     let mut unreadable: Vec<(Uuid, Uuid, String)> = Vec::new();
+    // 同一绑定下多条陈述：outcome 只写一次
+    let mut validation_written = HashSet::<Uuid>::new();
     for d in &due {
         if let Some(snap) = gate.as_ref() {
             let direction = match d.direction.as_str() {
@@ -315,6 +321,10 @@ async fn materialize_in_tx(
                 value_shape_ok,
             };
             let outcome = crate::alignment_gate::validate_due(&ends, snap);
+            if validation_written.insert(d.binding_id) {
+                crate::phrase_bindings::set_validation_outcome_tx(tx, d.binding_id, &outcome)
+                    .await?;
+            }
             if crate::alignment_gate::blocks_typing(&outcome) {
                 tracing::info!(
                     kb_id = %kb_id,

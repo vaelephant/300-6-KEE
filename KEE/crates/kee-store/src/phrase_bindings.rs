@@ -185,6 +185,10 @@ pub struct Binding {
     pub marks: Option<String>,
     /// 对齐器问过 marks 的时刻；NULL = 没问过。问过还没有值的不再问，等人（0053 修订）
     pub marks_asked_at: Option<DateTime<Utc>>,
+    /// OR-01 / 0076：稳定 reason_codes；空 = 尚未由 alignment_validation_v2 写过
+    pub reason_codes: Vec<String>,
+    /// OR-01：`accepted` / `needs_review` / `rejected`；NULL = v2 未记录
+    pub validation_decision: Option<String>,
 }
 
 impl Binding {
@@ -215,7 +219,7 @@ pub async fn bindings(pool: &PgPool, kb_id: Uuid) -> AppResult<Vec<Binding>> {
     Ok(sqlx::query_as(
         "SELECT phrase, subject_type_id, object_type_id, object_is_value,
                 relation_type_id, direction, status, decided_at, decided_by, basis, marks,
-                marks_asked_at
+                marks_asked_at, reason_codes, validation_decision
          FROM phrase_bindings WHERE kb_id = $1 ORDER BY phrase",
     )
     .bind(kb_id)
@@ -281,7 +285,7 @@ pub async fn stale(pool: &PgPool, kb_id: Uuid) -> AppResult<Vec<Binding>> {
     Ok(sqlx::query_as(
         "SELECT b.phrase, b.subject_type_id, b.object_type_id, b.object_is_value,
                 b.relation_type_id, b.direction, b.status, b.decided_at, b.decided_by, b.basis,
-                b.marks, b.marks_asked_at
+                b.marks, b.marks_asked_at, b.reason_codes, b.validation_decision
          FROM phrase_bindings b
          LEFT JOIN relation_types r ON r.id = b.relation_type_id
          WHERE b.kb_id = $1
@@ -449,7 +453,10 @@ pub async fn decide_on(
                 decided_by = EXCLUDED.decided_by,
                 basis = EXCLUDED.basis,
                 marks = EXCLUDED.marks,
-                marks_asked_at = EXCLUDED.marks_asked_at
+                marks_asked_at = EXCLUDED.marks_asked_at,
+                -- 新判定清掉上一轮物化守卫写下的码，等下一轮 v2 再填（0076）
+                reason_codes = '{}',
+                validation_decision = NULL
           WHERE NOT (phrase_bindings.decided_by = 'person' AND EXCLUDED.decided_by <> 'person')",
     )
     .bind(Uuid::now_v7())
@@ -479,6 +486,27 @@ pub async fn decide_on(
         crate::ontology_regressions::record_for_signature(connection, kb_id, sig).await?;
     }
     Ok(changed)
+}
+
+/// Persist an OR-01 validation outcome on the binding row (0076).
+/// Does not change `status`; materialisation refuses typing when decision is not accepted.
+pub async fn set_validation_outcome_tx(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    binding_id: Uuid,
+    outcome: &kee_reason::alignment_validation::ValidationOutcome,
+) -> AppResult<()> {
+    let codes: Vec<String> = outcome.reasons.iter().map(|r| r.as_str().to_string()).collect();
+    sqlx::query(
+        "UPDATE phrase_bindings
+            SET reason_codes = $2, validation_decision = $3
+          WHERE id = $1",
+    )
+    .bind(binding_id)
+    .bind(&codes)
+    .bind(outcome.decision.as_str())
+    .execute(&mut **tx)
+    .await?;
+    Ok(())
 }
 
 /// 给这一列之前绑上的签名补问 marks 的结果（0053 修订 2026-09-27）。这一问只问一刻标哪一端，
@@ -527,7 +555,8 @@ mod delivery_tests;
 
 #[cfg(test)]
 mod tests {
-    use super::normalize;
+    use super::*;
+    use kee_reason::alignment_validation::{Decision as VDecision, ReasonCode, ValidationOutcome};
 
     #[test]
     fn a_phrase_is_one_phrase_however_spaced_or_cased() {
@@ -535,5 +564,85 @@ mod tests {
         assert_eq!(normalize("Revenue"), "revenue");
         assert_eq!(normalize("细化解读"), "细化解读");
         assert_eq!(normalize("   "), "");
+    }
+
+    #[tokio::test]
+    async fn validation_outcome_is_persisted_on_the_binding() -> anyhow::Result<()> {
+        let Some(url) = crate::test_db::url() else {
+            return Ok(());
+        };
+        let pool = PgPool::connect(&url).await?;
+        crate::db::migrate(&pool).await?;
+
+        let (org, ws, kb, binding, property) = (
+            Uuid::now_v7(),
+            Uuid::now_v7(),
+            Uuid::now_v7(),
+            Uuid::now_v7(),
+            Uuid::now_v7(),
+        );
+        sqlx::query("INSERT INTO organizations(id,name) VALUES($1,'or01-persist')")
+            .bind(org)
+            .execute(&pool)
+            .await?;
+        sqlx::query("INSERT INTO workspaces(id,org_id,name) VALUES($1,$2,'or01-persist')")
+            .bind(ws)
+            .bind(org)
+            .execute(&pool)
+            .await?;
+        sqlx::query("INSERT INTO knowledge_bases(id,workspace_id,name) VALUES($1,$2,'or01-persist')")
+            .bind(kb)
+            .bind(ws)
+            .execute(&pool)
+            .await?;
+        sqlx::query(
+            "INSERT INTO relation_types(id,kb_id,key,label) VALUES($1,$2,'employs','employs')",
+        )
+        .bind(property)
+        .bind(kb)
+        .execute(&pool)
+        .await?;
+        sqlx::query(
+            "INSERT INTO phrase_bindings
+                 (id, kb_id, phrase, object_is_value, relation_type_id, direction,
+                  status, decided_by)
+             VALUES ($1, $2, 'employs', false, $3, 'forward', 'bound', 'agent')",
+        )
+        .bind(binding)
+        .bind(kb)
+        .bind(property)
+        .execute(&pool)
+        .await?;
+
+        let outcome = ValidationOutcome {
+            decision: VDecision::Rejected,
+            reasons: vec![ReasonCode::DomainMismatch, ReasonCode::OntologyVersionStale],
+        };
+        let mut tx = pool.begin().await?;
+        set_validation_outcome_tx(&mut tx, binding, &outcome).await?;
+        tx.commit().await?;
+
+        let row: (Vec<String>, Option<String>) = sqlx::query_as(
+            "SELECT reason_codes, validation_decision FROM phrase_bindings WHERE id = $1",
+        )
+        .bind(binding)
+        .fetch_one(&pool)
+        .await?;
+        assert_eq!(
+            row.0,
+            vec!["DOMAIN_MISMATCH".to_string(), "ONTOLOGY_VERSION_STALE".to_string()]
+        );
+        assert_eq!(row.1.as_deref(), Some("rejected"));
+
+        let listed = bindings(&pool, kb).await?;
+        assert_eq!(listed.len(), 1);
+        assert_eq!(listed[0].reason_codes, row.0);
+        assert_eq!(listed[0].validation_decision.as_deref(), Some("rejected"));
+
+        sqlx::query("DELETE FROM organizations WHERE id = $1")
+            .bind(org)
+            .execute(&pool)
+            .await?;
+        Ok(())
     }
 }
