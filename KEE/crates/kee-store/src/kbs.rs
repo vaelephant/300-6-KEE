@@ -109,6 +109,7 @@ pub async fn update(
     inference_interval_minutes: Option<i32>,
     auto_type_resolution: Option<bool>,
     governance: Option<bool>,
+    alignment_validation_v2: Option<bool>,
     data_conventions: Option<&str>,
 ) -> AppResult<KnowledgeBase> {
     // 改语言不回头重写已有的类——它们已经是这个库的数据，可能有人手工调过。
@@ -149,8 +150,9 @@ pub async fn update(
              -- 从关到开的那一刻记下来：保险丝只数它之后的撤回。SET 右边读的是旧值
              governance_since = CASE WHEN $10 IS TRUE AND NOT governance THEN now()
                                      ELSE governance_since END,
+             alignment_validation_v2 = COALESCE($11, alignment_validation_v2),
              -- 人写的约定；清空要送空串，送 null 等于不改（与 description 同一约定）
-             data_conventions = COALESCE($11, data_conventions),
+             data_conventions = COALESCE($12, data_conventions),
              updated_at = now()
          WHERE id = $1 RETURNING *",
     )
@@ -164,6 +166,7 @@ pub async fn update(
     .bind(inference_interval_minutes)
     .bind(auto_type_resolution)
     .bind(governance)
+    .bind(alignment_validation_v2)
     .bind(data_conventions)
     .fetch_optional(pool)
     .await?

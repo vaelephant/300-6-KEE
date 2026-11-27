@@ -2217,6 +2217,9 @@ export const zh: Strings = {
     governance: "让 agent 处理重复项队列",
     governanceNote:
       "先进先出。裁一对之前，agent 先读这个库里的人对同样的名字、同样的类型对做过什么决定：有先例撑着才合并，有把握就分开，其余的写成建议留给你。每一笔都列在审核页的 Agent 里，可以撤回。关掉，队列就停。",
+    alignmentValidation: "入账前按本体校验绑定",
+    alignmentValidationNote:
+      "短语即将变成类型化事实时，检查 domain、range、互斥、数据类型与单位。硬失败保留为开放陈述，并在审核队列给出机器可读的 reason codes，不会静默入账。",
     inferEvery: "每隔",
     minutes: "分钟重推",
     lastInference: (when: string) => `上次 ${when}`,

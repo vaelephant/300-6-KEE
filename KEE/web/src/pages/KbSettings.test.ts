@@ -74,6 +74,7 @@ const initial: Kb = {
   description: "Original description", visibility: "open", is_default: false,
   auto_extend_ontology: false, materialize_inferences: false,
   auto_type_resolution: false, governance: false, governance_since: null,
+  alignment_validation_v2: false,
   inference_interval_minutes: 60, last_inference_at: null, ontology_lang: "en",
 };
 let server: Kb;
@@ -194,7 +195,7 @@ it("accepts server updates on unedited cards", async () => {
     .toEqual([server.name, server.description]);
   expect(find(card(S.settings.kbs.visibility).children, Segmented)[0].value).toBe("restricted");
   expect(find(card(S.kbset.cardAutomation).children, Checkbox).map((input) => input.checked))
-    .toEqual([true, true, true]);
+    .toEqual([true, true, true, false]);
   expect(find(card(S.kbset.cardAutomation).children, Input)[0].value).toBe(120);
   expect(find(card(S.kbset.ontologyLang).children, Segmented)[0].value).toBe("zh");
 });
@@ -215,6 +216,6 @@ it.each([false, true])("resets drafts when switching KB with identical server va
     .toEqual([initial.name, initial.description]);
   expect(find(card(S.settings.kbs.visibility).children, Segmented)[0].value).toBe("open");
   expect(find(card(S.kbset.cardAutomation).children, Checkbox).map((input) => input.checked))
-    .toEqual([false, false, false]);
+    .toEqual([false, false, false, false]);
   expect(find(card(S.kbset.ontologyLang).children, Segmented)[0].value).toBe("en");
 });

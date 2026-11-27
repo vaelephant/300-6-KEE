@@ -55,7 +55,8 @@ describe("record moments on the account pages", () => {
       id: "kb1", workspace_id: "ws", name: "Research", kind: "knowledge", description: null,
       visibility: "restricted", is_default: false, auto_extend_ontology: true,
       materialize_inferences: false, auto_type_resolution: false, governance: false,
-      governance_since: null, inference_interval_minutes: 60, last_inference_at: null,
+      governance_since: null, alignment_validation_v2: false,
+      inference_interval_minutes: 60, last_inference_at: null,
       ontology_lang: "en",
     };
     // Alice 在上海早上 07:30 把我加进来；另一个库是我自己在零点整加入的

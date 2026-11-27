@@ -120,6 +120,8 @@ export function KbSettings() {
   const [autoResolve, setAutoResolve] = useState(false);
   // 治理（0025）：**缺省关**——它会合并实体，还没在哪个库上量过；打开就开始，关掉就停
   const [governance, setGovernance] = useState(false);
+  // 对齐校验（0076）：**缺省关**——开着才写 reason_codes、挡硬约束
+  const [alignmentValidation, setAlignmentValidation] = useState(false);
   const [inferMins, setInferMins] = useState(60);
   const [ontoLang, setOntoLang] = useState<"en" | "zh">("en");
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -144,6 +146,7 @@ export function KbSettings() {
       setMaterialize(kb.data.materialize_inferences);
       setAutoResolve(kb.data.auto_type_resolution);
       setGovernance(kb.data.governance);
+      setAlignmentValidation(kb.data.alignment_validation_v2);
       setInferMins(kb.data.inference_interval_minutes);
     }
   }, [
@@ -151,6 +154,7 @@ export function KbSettings() {
     kb.data?.materialize_inferences,
     kb.data?.auto_type_resolution,
     kb.data?.governance,
+    kb.data?.alignment_validation_v2,
     kb.data?.inference_interval_minutes,
   ]);
 
@@ -195,6 +199,7 @@ export function KbSettings() {
     materialize !== kb.data.materialize_inferences ||
     autoResolve !== kb.data.auto_type_resolution ||
     governance !== kb.data.governance ||
+    alignmentValidation !== kb.data.alignment_validation_v2 ||
     inferMins !== kb.data.inference_interval_minutes;
   const langDirty = ontoLang !== kb.data.ontology_lang;
 
@@ -350,6 +355,7 @@ export function KbSettings() {
                           materialize_inferences: materialize,
                           auto_type_resolution: autoResolve,
                           governance,
+                          alignment_validation_v2: alignmentValidation,
                           inference_interval_minutes: inferMins,
                         })
                       }
@@ -406,6 +412,12 @@ export function KbSettings() {
                     onChange={(v) => setGovernance(v)}
                     label={S.kbset.governance}
                     hint={S.kbset.governanceNote}
+                  />
+                  <Checkbox
+                    checked={alignmentValidation}
+                    onChange={(v) => setAlignmentValidation(v)}
+                    label={S.kbset.alignmentValidation}
+                    hint={S.kbset.alignmentValidationNote}
                   />
                 </div>
               </SettingsCard>

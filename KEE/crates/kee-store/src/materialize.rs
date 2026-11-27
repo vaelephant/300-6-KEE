@@ -280,7 +280,7 @@ async fn materialize_in_tx(
     .fetch_all(&mut **tx)
     .await?;
 
-    let gate = if crate::alignment_gate::v2_enabled() {
+    let gate = if crate::alignment_gate::v2_enabled_tx(tx, kb_id).await? {
         Some(crate::alignment_gate::load_ontology_snap(tx, kb_id).await?)
     } else {
         None

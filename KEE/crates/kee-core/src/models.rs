@@ -1206,6 +1206,9 @@ pub struct KnowledgeBase {
     /// 这次打开治理的时刻；保险丝只数它之后的撤回（0025 决定 9）。
     /// 新库生下来就开着治理，这一格于是等于建库的时刻（0050）
     pub governance_since: Option<DateTime<Utc>>,
+    /// 对齐期本体校验（0076 / OR-01，**缺省关**）：开着，候选绑定写入
+    /// `reason_codes` / `validation_decision`，硬约束在物化前挡住入账
+    pub alignment_validation_v2: bool,
     /// 多久重推一次（分钟）。见 `knowledge_bases.inference_interval_minutes`
     pub inference_interval_minutes: i32,
     /// 上次推完的时间。**答的是「上次看过没有」，不是「上次改过没有」**

@@ -55,6 +55,9 @@ pub struct UpdateKbReq {
     /// 打开那一刻就排一轮，关掉后任务在两簇之间看到就停。见 docs/decisions/0025
     #[serde(default)]
     pub governance: Option<bool>,
+    /// 对齐期本体校验（0076 / OR-01，缺省关）：开着写入 reason_codes，硬约束挡入账
+    #[serde(default)]
+    pub alignment_validation_v2: Option<bool>,
     /// 人写的数据约定（「测试单不算数」这类 schema 里没有的规则），问数与探索的
     /// 提示词都读它。探索生成的描述在另一个字段，PATCH 不了。见 #570
     #[serde(default)]
@@ -122,6 +125,7 @@ pub async fn create(
             None,
             None,
             Some(v),
+            None,
             None,
             None,
             None,
@@ -223,6 +227,7 @@ pub async fn update(
         req.inference_interval_minutes,
         req.auto_type_resolution,
         req.governance,
+        req.alignment_validation_v2,
         req.data_conventions.as_deref().map(str::trim),
     )
     .await?;
@@ -244,6 +249,7 @@ pub async fn update(
             "name": req.name,
             "visibility": req.visibility,
             "governance": req.governance,
+            "alignment_validation_v2": req.alignment_validation_v2,
             "data_conventions": req.data_conventions.is_some(),
         }),
     )

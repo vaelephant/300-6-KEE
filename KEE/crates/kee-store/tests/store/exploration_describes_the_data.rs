@@ -50,6 +50,7 @@ async fn the_description_and_the_conventions_do_not_overwrite_each_other() -> an
             None,
             None,
             None,
+            None,
             Some("Amounts are in cents.\nis_test = 1 is excluded."),
         )
         .await?;
@@ -100,6 +101,7 @@ async fn the_description_and_the_conventions_do_not_overwrite_each_other() -> an
             None,
             None,
             None,
+            None,
             Some("cents only"),
         )
         .await?;
@@ -114,6 +116,7 @@ async fn the_description_and_the_conventions_do_not_overwrite_each_other() -> an
             no,
             None,
             no,
+            None,
             None,
             None,
             None,

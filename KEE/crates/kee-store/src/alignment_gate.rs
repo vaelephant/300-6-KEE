@@ -2,28 +2,62 @@
 //!
 //! Pure decisions live in [`kee_reason::alignment_validation`]. This module
 //! loads the KB's class hierarchy and property ends, and decides whether a
-//! bound `(statement, property)` pair may type. Off unless
-//! `KEE_ALIGNMENT_VALIDATION_V2` is set to a truthy value (not `0` / `false`).
+//! bound `(statement, property)` pair may type. Off unless the KB's
+//! `alignment_validation_v2` column is on (or the lab env override forces on).
 
 use std::collections::HashMap;
 
 use kee_reason::alignment_validation::{
     self, Candidate, Direction, PropertyShape, ValidationOutcome,
 };
-use sqlx::{Postgres, Transaction};
+use sqlx::{PgPool, Postgres, Transaction};
 use uuid::Uuid;
 
 use kee_core::AppResult;
 
-/// Deploy / lab switch for OR-01. Default off preserves today's materialisation.
-pub fn v2_enabled() -> bool {
+/// Process-wide lab override. When truthy, every KB runs v2 regardless of column.
+fn env_force_on() -> bool {
     match std::env::var("KEE_ALIGNMENT_VALIDATION_V2") {
         Ok(v) => {
             let v = v.trim();
-            !(v.is_empty() || v == "0" || v.eq_ignore_ascii_case("false") || v.eq_ignore_ascii_case("off"))
+            !(v.is_empty()
+                || v == "0"
+                || v.eq_ignore_ascii_case("false")
+                || v.eq_ignore_ascii_case("off"))
         }
         Err(_) => false,
     }
+}
+
+/// Per-KB OR-01 switch. Default off preserves today's materialisation.
+pub async fn v2_enabled(pool: &PgPool, kb_id: Uuid) -> AppResult<bool> {
+    if env_force_on() {
+        return Ok(true);
+    }
+    let on: Option<bool> = sqlx::query_scalar(
+        "SELECT alignment_validation_v2 FROM knowledge_bases WHERE id = $1",
+    )
+    .bind(kb_id)
+    .fetch_optional(pool)
+    .await?;
+    Ok(on.unwrap_or(false))
+}
+
+/// Same as [`v2_enabled`], reading through an open transaction.
+pub async fn v2_enabled_tx(
+    tx: &mut Transaction<'_, Postgres>,
+    kb_id: Uuid,
+) -> AppResult<bool> {
+    if env_force_on() {
+        return Ok(true);
+    }
+    let on: Option<bool> = sqlx::query_scalar(
+        "SELECT alignment_validation_v2 FROM knowledge_bases WHERE id = $1",
+    )
+    .bind(kb_id)
+    .fetch_optional(&mut **tx)
+    .await?;
+    Ok(on.unwrap_or(false))
 }
 
 /// Ontology snapshot used for one materialise pass.

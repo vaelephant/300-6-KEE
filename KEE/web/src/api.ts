@@ -164,6 +164,8 @@ export interface Kb {
   governance: boolean;
   /** 这次打开治理的时刻；保险丝只数它之后的撤回 */
   governance_since: string | null;
+  /** 对齐期本体校验（0076 / OR-01，缺省关）：开着写入 reason_codes，硬约束挡入账 */
+  alignment_validation_v2: boolean;
   /** 多久重推一次（分钟）。事实持续在变，只靠手点会让派生一直是缺的 */
   inference_interval_minutes: number;
   /** 上次推完的时间 */

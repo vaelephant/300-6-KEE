@@ -348,7 +348,7 @@ pub(crate) async fn bind_declared(
     if keys.is_empty() {
         return Ok(0);
     }
-    let snap = if alignment_gate::v2_enabled() {
+    let snap = if alignment_gate::v2_enabled(pool, kb_id).await? {
         Some(alignment_gate::load_ontology_snap_pool(pool, kb_id).await?)
     } else {
         None
@@ -869,13 +869,14 @@ async fn align_phrases_locked(
     let by_key: HashMap<&str, &RelationTypeView> =
         props.iter().map(|p| (p.key.as_str(), p)).collect();
     let closure = closures(classes.iter().map(|c| (c.id, c.parents.as_slice())));
-    let validation_snap: Option<Arc<OntologySnap>> = if alignment_gate::v2_enabled() {
-        Some(Arc::new(
-            alignment_gate::load_ontology_snap_pool(pool, kb_id).await?,
-        ))
-    } else {
-        None
-    };
+    let validation_snap: Option<Arc<OntologySnap>> =
+        if alignment_gate::v2_enabled(pool, kb_id).await? {
+            Some(Arc::new(
+                alignment_gate::load_ontology_snap_pool(pool, kb_id).await?,
+            ))
+        } else {
+            None
+        };
     let versions = phrase_bindings::property_versions(pool, kb_id).await?;
     let sigs = phrase_bindings::signatures(pool, kb_id).await?;
     let existing: HashMap<_, _> = phrase_bindings::bindings(pool, kb_id)
@@ -1248,7 +1249,8 @@ async fn align_phrases_locked(
                 _ => false,
             };
             if !agree || invalid_direction {
-                let ambiguous = alignment_gate::v2_enabled()
+                let ambiguous = alignment_gate::v2_enabled(pool, kb_id)
+                    .await?
                     .then(alignment_gate::ambiguous_outcome);
                 phrase_bindings::decide_validated(
                     pool,

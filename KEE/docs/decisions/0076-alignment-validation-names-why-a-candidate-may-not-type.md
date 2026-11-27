@@ -1,6 +1,6 @@
 # 0076 · Alignment validation names why a candidate may not type
 
-- **Status**: In progress 2026-11-27 · open: per-KB flag (env `KEE_ALIGNMENT_VALIDATION_V2` still process-wide), richer human hard-override UX beyond queue visibility
+- **Status**: In progress 2026-11-28 · open: richer human hard-override UX beyond queue visibility
 - **Written**: 2026-11-27
 - **Related**: [0012](0012-the-ontology-is-a-contract-not-a-suggestion.md); [0044](0044-the-ontology-is-a-view-over-what-documents-say.md) decisions 2–3; [0051](0051-a-human-phrase-decision-carries-its-materialization-work.md); [0053](0053-a-phrase-decision-records-the-inputs-it-considered.md); plan [`KEE-V0.2-ONTOLOGY-RUNTIME`](../plans/KEE-V0.2-ONTOLOGY-RUNTIME.md) OR-01; baseline [`KEE-V0.2-W0-BASELINE-AUDIT`](../plans/KEE-V0.2-W0-BASELINE-AUDIT.md)
 
@@ -72,7 +72,7 @@ A `rejected` or `needs_review` outcome does not remove the open statement, its e
 
 ### 5. Feature flag and scope
 
-Ship behind `alignment_validation_v2` (name indicative; follow the deployment config convention in force). Enable per KB or workspace. With the flag off, behaviour matches today's binding statuses and materialisation. With the flag on, reason codes are populated and hard codes block typing as above.
+Ship behind `knowledge_bases.alignment_validation_v2` (per KB; default off). With the flag off, behaviour matches today's binding statuses and materialisation. With the flag on, reason codes are populated and hard codes block typing as above. Process-wide `KEE_ALIGNMENT_VALIDATION_V2` remains a lab override that forces every KB on without touching the column.
 
 Industry packs (e.g. HCC) must not hard-code clinical rules into the validator; only generic ontology constraints belong here.
 
@@ -98,3 +98,4 @@ Industry packs (e.g. HCC) must not hard-code clinical rules into the validator; 
 - 2026-11-27: Migration 0129 adds `phrase_bindings.reason_codes` + `validation_decision`; materialise writes them when the v2 gate runs.
 - 2026-11-27: Phrase alignment (agent + declared ontology binds) validates before write; hard reject → `none`, review → `undecided`, with durable codes; disagree votes get `AMBIGUOUS_BINDING`.
 - 2026-11-27: Alignment queue API + Review UI surface `reason_codes` / `validation_decision`; `none` rows with codes also enter the waiting queue.
+- 2026-11-28: Per-KB column `alignment_validation_v2` (migration 0130) + KB Settings toggle; env remains lab force-on only.

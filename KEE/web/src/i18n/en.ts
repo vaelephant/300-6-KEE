@@ -2528,6 +2528,10 @@ export const en = {
     governance: "Let the agent work the duplicates queue",
     governanceNote:
       "First in, first out. Before deciding a pair the agent reads what people in this base decided on the same names and the same kinds of pairs. It merges only where that history supports it, keeps apart on confidence, and leaves a proposal for everything else. Every decision is listed under Agent on the Review page and can be reverted. Turning this off stops the queue.",
+    alignmentValidation:
+      "Validate bindings against the ontology before typing",
+    alignmentValidationNote:
+      "When a phrase would become a typed fact, check domain, range, disjointness, datatype, and unit. Hard failures stay as open statements with machine-readable reason codes on the Review queue; they never silently type.",
     inferEvery: "Re-derive every",
     minutes: "minutes",
     lastInference: (when: string) => `last run ${when}`,
